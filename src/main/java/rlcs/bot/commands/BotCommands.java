@@ -87,7 +87,8 @@ public class BotCommands extends ListenerAdapter
                 new Score(blueSeriesScoreOpt, orangeSeriesScoreOpt),
                 blueTeam,
                 orangeTeam,
-                bestOfOpt
+                bestOfOpt,
+                false
                 );
 
         event.getHook().sendMessage(new SeriesActions().generateSeriesString(series))
@@ -114,11 +115,12 @@ public class BotCommands extends ListenerAdapter
         String originalMessage = event.getMessage().getContentRaw();
         Series series = seriesActions.parseSeriesFromString(originalMessage);
         series.getGameScore().setBlueScore(series.getGameScore().getBlueScore() + 1);
-        if (series.getGameScore().getBlueScore() >= 9)
+        if (series.getGameScore().getBlueScore() >= 10)
         {
             event.reply("Sorry - only single digit goals.  Please raise a Jira™️").setEphemeral(true).queue();
             return;
         }
+        series.setOvertime(false);
         series.setMessageCount(series.getMessageCount() + 1);
         String updatedSeriesString = seriesActions.generateSeriesString(series);
         event.editMessage(updatedSeriesString).queue();
@@ -128,12 +130,13 @@ public class BotCommands extends ListenerAdapter
     {
         String originalMessage = event.getMessage().getContentRaw();
         Series series = seriesActions.parseSeriesFromString(originalMessage);
-        if (series.getGameScore().getOrangeScore() >= 9)
+        series.getGameScore().setOrangeScore(series.getGameScore().getOrangeScore() + 1);
+        if (series.getGameScore().getOrangeScore() >= 10)
         {
             event.reply("Sorry - only single digit goals.  Please raise a Jira™️").setEphemeral(true).queue();
             return;
         }
-        series.getGameScore().setOrangeScore(series.getGameScore().getOrangeScore() + 1);
+        series.setOvertime(false);
         series.setMessageCount(series.getMessageCount() + 1);
         String updatedSeriesString = seriesActions.generateSeriesString(series);
         event.editMessage(updatedSeriesString).queue();
@@ -167,6 +170,7 @@ public class BotCommands extends ListenerAdapter
             series.getSeriesScore().setOrangeScore(series.getSeriesScore().getOrangeScore() + 1);
         }
         series.setMessageCount(series.getMessageCount() + 1);
+        series.setOvertime(false);
         series.getGameScore().setBlueScore(0);
         series.getGameScore().setOrangeScore(0);
         String updatedSeriesString = seriesActions.generateSeriesString(series);
@@ -177,6 +181,17 @@ public class BotCommands extends ListenerAdapter
     {
         String originalMessage = event.getMessage().getContentRaw();
         Series series = seriesActions.parseSeriesFromString(originalMessage);
+
+        int blueGameScore = series.getGameScore().getBlueScore();
+        int orangeGameScore = series.getGameScore().getOrangeScore();
+
+        if (blueGameScore != orangeGameScore)
+        {
+            event.reply("Scores are not level - overtime not possible").setEphemeral(true).queue();
+            return;
+        }
+
+        series.setOvertime(true);
         series.setMessageCount(series.getMessageCount() + 1);
         String updatedSeriesString = seriesActions.generateSeriesString(series);
         event.editMessage(updatedSeriesString).queue();

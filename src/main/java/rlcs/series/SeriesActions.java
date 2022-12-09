@@ -128,6 +128,12 @@ public class SeriesActions
         return stringBuilder.toString();
     }
 
+    public String generateOvertimeString(Series series)
+    {
+        String overtimeString = "Overtime: " + series.isOvertime();
+        return overtimeString;
+    }
+
     public String generateSeriesString(Series series)
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -141,6 +147,8 @@ public class SeriesActions
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(generatePlayerString(series, TeamColour.ORANGE));
         stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(generateOvertimeString(series));
+        stringBuilder.append(System.getProperty("line.separator"));
         return stringBuilder.toString();
     }
 
@@ -152,6 +160,7 @@ public class SeriesActions
         String seriesScoreString = lines[2];
         String bluePlayers = lines[3];
         String orangePlayers = lines[4];
+        String overtimeString = lines[5];
 
         // parse header
         String[] parsedHeaderString = headerString.split("-");
@@ -188,6 +197,9 @@ public class SeriesActions
         String orangePlayer2 = parsedOrangePlayers[1].replace("[2] ", "").trim();
         String orangePlayer3 = parsedOrangePlayers[2].replace("[3] ", "").trim();
 
+        // parse overtime
+        boolean overtime = Boolean.parseBoolean(overtimeString.split("Overtime: ")[1]);
+
         Team blueTeam = new Team(blueTeamName,
                 new Player(bluePlayer1),
                 new Player(bluePlayer2),
@@ -206,7 +218,8 @@ public class SeriesActions
                 new Score(blueSeriesScore, orangeSeriesScore),
                 blueTeam,
                 orangeTeam,
-                bestOf
+                bestOf,
+                overtime
         );
 
         return series;
