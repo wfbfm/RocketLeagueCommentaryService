@@ -12,7 +12,7 @@ public class DiscordBot {
 
     public static void main(String[] args) throws InterruptedException
     {
-        JDA jda = JDABuilder.createDefault("INSERT-TOKEN-HERE")
+        JDA jda = JDABuilder.createDefault("ENTER-TOKEN-HERE")
                 .setActivity(Activity.watching("RLCS"))
                 .addEventListeners(new BotCommands())
                 .build()
