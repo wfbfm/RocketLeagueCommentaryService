@@ -9,6 +9,12 @@ import rlcs.series.*;
 
 public class BotCommands extends ListenerAdapter
 {
+    private static SeriesActions seriesActions = new SeriesActions();
+    public BotCommands()
+    {
+
+    }
+
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event)
     {
@@ -25,9 +31,13 @@ public class BotCommands extends ListenerAdapter
         {
             handleCommentEvent(event);
         }
-        if (event.getButton().getId().equals("goal"))
+        if (event.getButton().getId().equals("goalblue"))
         {
-            handleGoalEvent(event);
+            handleGoalBlueEvent(event);
+        }
+        if (event.getButton().getId().equals("goalorange"))
+        {
+            handleGoalOrangeEvent(event);
         }
         if (event.getButton().getId().equals("game"))
         {
@@ -36,10 +46,6 @@ public class BotCommands extends ListenerAdapter
         if (event.getButton().getId().equals("overtime"))
         {
             handleOvertimeEvent(event);
-        }
-        if (event.getButton().getId().equals("edit"))
-        {
-            handleEditEvent(event);
         }
     }
 
@@ -86,41 +92,93 @@ public class BotCommands extends ListenerAdapter
 
         event.getHook().sendMessage(new SeriesActions().generateSeriesString(series))
                 .setActionRow(
-                        Button.secondary("comment", "💬 Comment"),
-                        Button.primary("goal", "⚽ Goal"),
+                        Button.primary("goalblue", "⚽ " + blueTeam.getTeamName()),
+                        Button.danger("goalorange", "⚽ " + orangeTeam.getTeamName()),
                         Button.success("game", "🏁 Game"),
-                        Button.danger("overtime", "🕒 Overtime"),
-                        Button.secondary("edit", "📝 Edit"))
+                        Button.secondary("overtime", "🕒 Overtime"),
+                        Button.secondary("comment", "💬 Comment"))
                 .queue();
     }
 
     private static void handleCommentEvent(@NotNull ButtonInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        event.editMessage(originalMessage + System.getProperty("line.separator") + " - hi the comment button was pressed").queue();
+        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        series.setMessageCount(series.getMessageCount() + 1);
+        String updatedSeriesString = seriesActions.generateSeriesString(series);
+        event.editMessage(updatedSeriesString).queue();
     }
 
-    private static void handleGoalEvent(@NotNull ButtonInteractionEvent event)
+    private static void handleGoalBlueEvent(@NotNull ButtonInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        event.editMessage(originalMessage + System.getProperty("line.separator") + " - hi the goal button was pressed").queue();
+        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        series.getGameScore().setBlueScore(series.getGameScore().getBlueScore() + 1);
+        if (series.getGameScore().getBlueScore() >= 9)
+        {
+            event.reply("Sorry - only single digit goals.  Please raise a Jira™️").setEphemeral(true).queue();
+            return;
+        }
+        series.setMessageCount(series.getMessageCount() + 1);
+        String updatedSeriesString = seriesActions.generateSeriesString(series);
+        event.editMessage(updatedSeriesString).queue();
+    }
+
+    private static void handleGoalOrangeEvent(@NotNull ButtonInteractionEvent event)
+    {
+        String originalMessage = event.getMessage().getContentRaw();
+        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        if (series.getGameScore().getOrangeScore() >= 9)
+        {
+            event.reply("Sorry - only single digit goals.  Please raise a Jira™️").setEphemeral(true).queue();
+            return;
+        }
+        series.getGameScore().setOrangeScore(series.getGameScore().getOrangeScore() + 1);
+        series.setMessageCount(series.getMessageCount() + 1);
+        String updatedSeriesString = seriesActions.generateSeriesString(series);
+        event.editMessage(updatedSeriesString).queue();
     }
 
     private static void handleGameEvent(@NotNull ButtonInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        event.editMessage(originalMessage + System.getProperty("line.separator") + " - hi the game button was pressed").queue();
+        Series series = seriesActions.parseSeriesFromString(originalMessage);
+
+        int blueGameScore = series.getGameScore().getBlueScore();
+        int orangeGameScore = series.getGameScore().getOrangeScore();
+        int maxScore = (series.getBestOf() + 1) / 2;
+
+        if (blueGameScore == orangeGameScore)
+        {
+            event.reply("Scores are level - cannot end game").setEphemeral(true).queue();
+            return;
+        }
+        if (series.getSeriesScore().getBlueScore() >= maxScore || series.getSeriesScore().getOrangeScore() >= maxScore)
+        {
+            event.reply("Series already won - cannot end game").setEphemeral(true).queue();
+            return;
+        }
+        if (blueGameScore > orangeGameScore)
+        {
+            series.getSeriesScore().setBlueScore(series.getSeriesScore().getBlueScore() + 1);
+        }
+        else
+        {
+            series.getSeriesScore().setOrangeScore(series.getSeriesScore().getOrangeScore() + 1);
+        }
+        series.setMessageCount(series.getMessageCount() + 1);
+        series.getGameScore().setBlueScore(0);
+        series.getGameScore().setOrangeScore(0);
+        String updatedSeriesString = seriesActions.generateSeriesString(series);
+        event.editMessage(updatedSeriesString).queue();
     }
 
     private static void handleOvertimeEvent(@NotNull ButtonInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        event.editMessage(originalMessage + System.getProperty("line.separator") + " - hi the overtime button was pressed").queue();
-    }
-
-    private static void handleEditEvent(@NotNull ButtonInteractionEvent event)
-    {
-        String originalMessage = event.getMessage().getContentRaw();
-        event.editMessage(originalMessage + System.getProperty("line.separator") + " - hi the edit button was pressed").queue();
+        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        series.setMessageCount(series.getMessageCount() + 1);
+        String updatedSeriesString = seriesActions.generateSeriesString(series);
+        event.editMessage(updatedSeriesString).queue();
     }
 }
