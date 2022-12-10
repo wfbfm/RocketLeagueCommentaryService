@@ -1,9 +1,15 @@
 package rlcs.bot.commands;
 
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 import rlcs.series.*;
 
@@ -46,6 +52,103 @@ public class BotCommands extends ListenerAdapter
         if (event.getButton().getId().equals("overtime"))
         {
             handleOvertimeEvent(event);
+        }
+    }
+
+    @Override
+    public void onModalInteraction(@NotNull ModalInteractionEvent event)
+    {
+        if (event.getModalId().equals("bluegoalmodal"))
+        {
+            String originalMessage = event.getMessage().getContentRaw();
+            Series series = seriesActions.parseSeriesFromString(originalMessage);
+
+            String scorer = event.getValue("scorer").getAsString();
+            String assister = event.getValue("assister").getAsString();
+            String gameTime = event.getValue("gametime").getAsString();
+            String commentary = event.getValue("commentary").getAsString();
+
+            series.getGameScore().setBlueScore(series.getGameScore().getBlueScore() + 1);
+
+            series.setOvertime(false);
+            series.setMessageCount(series.getMessageCount() + 1);
+            String updatedSeriesTemplateString = seriesActions.generateSeriesString(series);
+
+
+            TextChannel publishChannel = event.getJDA().getTextChannelById(1049857570581516348L);
+
+
+            String[] lines = originalMessage.split(System.getProperty("line.separator"));
+            StringBuilder publishStringBuilder = new StringBuilder();
+
+            for (int i = 0; i < 3; i++)
+            {
+                publishStringBuilder.append(lines[i]);
+                publishStringBuilder.append(System.getProperty("line.separator"));
+            }
+
+            String scorerName = null;
+            switch (scorer)
+            {
+                case "1":
+                    scorerName = series.getBlueTeam().getPlayer1().getName();
+                    break;
+                case "2":
+                    scorerName = series.getBlueTeam().getPlayer2().getName();
+                    break;
+                case "3":
+                    scorerName = series.getBlueTeam().getPlayer3().getName();
+                    break;
+                default:
+                    break;
+            }
+
+            String assisterName = null;
+            switch (assister)
+            {
+                case "1":
+                    assisterName = series.getBlueTeam().getPlayer1().getName();
+                    break;
+                case "2":
+                    assisterName = series.getBlueTeam().getPlayer2().getName();
+                    break;
+                case "3":
+                    assisterName = series.getBlueTeam().getPlayer3().getName();
+                    break;
+                default:
+                    break;
+            }
+
+            if (scorerName != null)
+            {
+                publishStringBuilder.append("⚽ **" + scorerName + "**     ");
+                if (assisterName != null)
+                {
+                    publishStringBuilder.append("🤝 **" + assisterName +"**     ");
+                }
+                if (gameTime != null)
+                {
+                    publishStringBuilder.append("🕒 " + gameTime);
+                }
+            }
+
+            publishStringBuilder.append(System.getProperty("line.separator"));
+
+            if (commentary != null)
+            {
+                commentary = commentary.replace("[1]", "**" + series.getBlueTeam().getPlayer1().getName()+ "**");
+                commentary = commentary.replace("[2]", "**" + series.getBlueTeam().getPlayer2().getName() + "**");
+                commentary = commentary.replace("[3]", "**" + series.getBlueTeam().getPlayer3().getName() + "**");
+
+                publishStringBuilder.append(commentary);
+            }
+
+            if (publishChannel != null)
+            {
+                publishChannel.sendMessage(publishStringBuilder.toString()).queue();
+            }
+
+            event.editMessage(updatedSeriesTemplateString).queue();
         }
     }
 
@@ -114,16 +217,51 @@ public class BotCommands extends ListenerAdapter
     {
         String originalMessage = event.getMessage().getContentRaw();
         Series series = seriesActions.parseSeriesFromString(originalMessage);
-        series.getGameScore().setBlueScore(series.getGameScore().getBlueScore() + 1);
-        if (series.getGameScore().getBlueScore() >= 10)
+
+        if (series.getGameScore().getBlueScore() >= 9)
         {
             event.reply("Sorry - only single digit goals.  Please raise a Jira™️").setEphemeral(true).queue();
             return;
         }
-        series.setOvertime(false);
-        series.setMessageCount(series.getMessageCount() + 1);
-        String updatedSeriesString = seriesActions.generateSeriesString(series);
-        event.editMessage(updatedSeriesString).queue();
+
+        String player1 = series.getBlueTeam().getPlayer1().getName();
+        String player2 = series.getBlueTeam().getPlayer2().getName();
+        String player3 = series.getBlueTeam().getPlayer3().getName();
+
+        String labelAddOn = "[1]" + player1.substring(0, Math.min(player1.length(),10))
+        + " [2]" + player2.substring(0, Math.min(player2.length(),10))
+        + " [3]" + player3.substring(0, Math.min(player3.length(),10));
+
+        TextInput scorer = TextInput.create("scorer", "⚽ Scorer - Enter Player ID per below", TextInputStyle.SHORT)
+                .setMinLength(1)
+                .setMaxLength(1)
+                .setPlaceholder(labelAddOn)
+                .setRequired(true)
+                .build();
+
+        TextInput assister = TextInput.create("assister", "🤝 Assist - Enter Player ID per below, or 0", TextInputStyle.SHORT)
+                .setMaxLength(1)
+                .setPlaceholder(labelAddOn)
+                .setRequired(false)
+                .build();
+
+        TextInput gameTime = TextInput.create("gametime", "🕒 Time in game", TextInputStyle.SHORT)
+                .setMaxLength(8)
+                .setPlaceholder("0:00")
+                .setRequired(false)
+                .build();
+
+        TextInput commentary = TextInput.create("commentary", "💬 Comment (eg \"[1]\" is replaced by player)", TextInputStyle.PARAGRAPH)
+                .setMinLength(5)
+                .setMaxLength(500)
+                .setRequired(false)
+                .build();
+
+        Modal modal = Modal.create("bluegoalmodal", "Goal Scored by " + series.getBlueTeam().getTeamName())
+                .addActionRows(ActionRow.of(scorer), ActionRow.of(assister), ActionRow.of(gameTime), ActionRow.of(commentary))
+                .build();
+
+        event.replyModal(modal).queue();
     }
 
     private static void handleGoalOrangeEvent(@NotNull ButtonInteractionEvent event)

@@ -39,6 +39,8 @@ public class DiscordBot {
                             new OptionData(OptionType.STRING, "orangeplayer2", "Orange player 2", true),
                             new OptionData(OptionType.STRING, "orangeplayer3", "Orange player 3", true)
                     ).queue();
+
+            rlcsGuild.upsertCommand("bluegoalmodal", "Goal for Blue team").queue();
         }
     }
 
