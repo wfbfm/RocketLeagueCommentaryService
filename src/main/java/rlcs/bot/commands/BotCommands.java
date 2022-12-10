@@ -529,10 +529,10 @@ public class BotCommands extends ListenerAdapter
                 + " [b3]" + bluePlayer3.substring(0, Math.min(bluePlayer3.length(), 10))
                 + System.getProperty("line.separator")
                 + "[o1]" + orangePlayer1.substring(0, Math.min(orangePlayer1.length(), 10))
-                + " [o2]" + orangePlayer3.substring(0, Math.min(orangePlayer2.length(), 10))
+                + " [o2]" + orangePlayer2.substring(0, Math.min(orangePlayer2.length(), 10))
                 + " [o3]" + orangePlayer3.substring(0, Math.min(orangePlayer3.length(), 10));
 
-        TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\"is blue player1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
+        TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\" blue p1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
                 .setMinLength(5)
                 .setMaxLength(500)
                 .setPlaceholder(labelAddOn)
@@ -691,10 +691,10 @@ public class BotCommands extends ListenerAdapter
                 + " [b3]" + bluePlayer3.substring(0, Math.min(bluePlayer3.length(), 10))
                 + System.getProperty("line.separator")
                 + "[o1]" + orangePlayer1.substring(0, Math.min(orangePlayer1.length(), 10))
-                + " [o2]" + orangePlayer3.substring(0, Math.min(orangePlayer2.length(), 10))
+                + " [o2]" + orangePlayer2.substring(0, Math.min(orangePlayer2.length(), 10))
                 + " [o3]" + orangePlayer3.substring(0, Math.min(orangePlayer3.length(), 10));
 
-        TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\"is blue player1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
+        TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\" blue p1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
                 .setMinLength(5)
                 .setMaxLength(500)
                 .setPlaceholder(labelAddOn)
@@ -723,7 +723,7 @@ public class BotCommands extends ListenerAdapter
             return;
         }
 
-        TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\"is blue player1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
+        TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\" blue p1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
                 .setMinLength(5)
                 .setMaxLength(500)
                 .setValue("🚨 🕒 OVERTIME 🕒 🚨")
