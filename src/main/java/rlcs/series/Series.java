@@ -11,8 +11,9 @@ public class Series
     private Team orangeTeam;
 
     private int bestOf;
+    private boolean overtime;
 
-    public Series(int seriesId, int messageCount, Score gameScore, Score seriesScore, Team blueTeam, Team orangeTeam, int bestOf)
+    public Series(int seriesId, int messageCount, Score gameScore, Score seriesScore, Team blueTeam, Team orangeTeam, int bestOf, boolean overtime)
     {
         this.seriesId = seriesId;
         this.messageCount = messageCount;
@@ -21,6 +22,7 @@ public class Series
         this.blueTeam = blueTeam;
         this.orangeTeam = orangeTeam;
         this.bestOf = bestOf;
+        this.overtime = false;
     }
 
 
@@ -92,5 +94,15 @@ public class Series
     public void setBestOf(int bestOf)
     {
         this.bestOf = bestOf;
+    }
+
+    public boolean isOvertime()
+    {
+        return overtime;
+    }
+
+    public void setOvertime(boolean overtime)
+    {
+        this.overtime = overtime;
     }
 }

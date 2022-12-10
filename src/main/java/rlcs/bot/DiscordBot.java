@@ -12,7 +12,7 @@ public class DiscordBot {
 
     public static void main(String[] args) throws InterruptedException
     {
-        JDA jda = JDABuilder.createDefault("ENTER-TOKEN-HERE")
+        JDA jda = JDABuilder.createDefault("ENTER_TOKEN_HERE")
                 .setActivity(Activity.watching("RLCS"))
                 .addEventListeners(new BotCommands())
                 .build()
@@ -39,6 +39,8 @@ public class DiscordBot {
                             new OptionData(OptionType.STRING, "orangeplayer2", "Orange player 2", true),
                             new OptionData(OptionType.STRING, "orangeplayer3", "Orange player 3", true)
                     ).queue();
+
+            rlcsGuild.upsertCommand("bluegoalmodal", "Goal for Blue team").queue();
         }
     }
 
