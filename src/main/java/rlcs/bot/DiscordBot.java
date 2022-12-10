@@ -41,6 +41,10 @@ public class DiscordBot {
                     ).queue();
 
             rlcsGuild.upsertCommand("bluegoalmodal", "Goal for Blue team").queue();
+            rlcsGuild.upsertCommand("orangegoalmodal", "Goal for Orange team").queue();
+            rlcsGuild.upsertCommand("gamemodal", "End Game").queue();
+            rlcsGuild.upsertCommand("overtimemodal", "Enter Overtime").queue();
+            rlcsGuild.upsertCommand("commentmodal", "Enter Comment").queue();
         }
     }
 
