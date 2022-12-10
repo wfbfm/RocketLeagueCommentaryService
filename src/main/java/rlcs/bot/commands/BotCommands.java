@@ -107,7 +107,8 @@ public class BotCommands extends ListenerAdapter
 
 
         String[] lines = updatedSeriesTemplateString.split(System.getProperty("line.separator"));
-        StringBuilder publishStringBuilder = new StringBuilder();
+        StringBuilder publishStringBuilder = new StringBuilder(System.getProperty("line.separator"));
+        publishStringBuilder.append(System.getProperty("line.separator"));
 
         for (int i = 0; i < 3; i++)
         {
@@ -206,7 +207,8 @@ public class BotCommands extends ListenerAdapter
 
 
         String[] lines = updatedSeriesTemplateString.split(System.getProperty("line.separator"));
-        StringBuilder publishStringBuilder = new StringBuilder();
+        StringBuilder publishStringBuilder = new StringBuilder(System.getProperty("line.separator"));
+        publishStringBuilder.append(System.getProperty("line.separator"));
 
         for (int i = 0; i < 3; i++)
         {
@@ -318,7 +320,8 @@ public class BotCommands extends ListenerAdapter
 
 
         String[] lines = updatedSeriesTemplateString.split(System.getProperty("line.separator"));
-        StringBuilder publishStringBuilder = new StringBuilder();
+        StringBuilder publishStringBuilder = new StringBuilder(System.getProperty("line.separator"));
+        publishStringBuilder.append(System.getProperty("line.separator"));
 
         for (int i = 0; i < 3; i++)
         {
@@ -373,7 +376,8 @@ public class BotCommands extends ListenerAdapter
 
 
         String[] lines = updatedSeriesTemplateString.split(System.getProperty("line.separator"));
-        StringBuilder publishStringBuilder = new StringBuilder();
+        StringBuilder publishStringBuilder = new StringBuilder(System.getProperty("line.separator"));
+        publishStringBuilder.append(System.getProperty("line.separator"));
 
         for (int i = 0; i < 3; i++)
         {
@@ -427,7 +431,8 @@ public class BotCommands extends ListenerAdapter
 
 
         String[] lines = updatedSeriesTemplateString.split(System.getProperty("line.separator"));
-        StringBuilder publishStringBuilder = new StringBuilder();
+        StringBuilder publishStringBuilder = new StringBuilder(System.getProperty("line.separator"));
+        publishStringBuilder.append(System.getProperty("line.separator"));
 
         for (int i = 0; i < 3; i++)
         {
