@@ -231,8 +231,7 @@ public class ModalCommandHandler extends ListenerAdapter
 
     private static void publishCommentaryMessage(@NotNull ModalInteractionEvent event, StringBuilder publishStringBuilder)
     {
-        // TODO: Replace hardcoded channel id with environment variable
-        TextChannel publishChannel = event.getJDA().getTextChannelById(1049857570581516348L);
+        TextChannel publishChannel = event.getJDA().getTextChannelById(System.getenv("COMMENTARY_CHANNEL"));
         if (publishChannel != null)
         {
             publishChannel.sendMessage(publishStringBuilder.toString()).queue();

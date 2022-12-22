@@ -16,14 +16,13 @@ public class RLCSDiscordBot {
 
     public static void main(String[] args) throws InterruptedException
     {
-        // TODO: Add environment variable for token; guild id
-        JDA jda = JDABuilder.createDefault("ENTER_TOKEN_HERE")
+        JDA jda = JDABuilder.createDefault(System.getenv("BOT_TOKEN"))
                 .setActivity(Activity.watching("RLCS"))
                 .addEventListeners(new SlashCommandHandler(), new ButtonCommandHandler(), new ModalCommandHandler())
                 .build()
                 .awaitReady();
 
-        Guild rlcsGuild = jda.getGuildById(1048640527920271381L);
+        Guild rlcsGuild = jda.getGuildById(System.getenv("GUILD_ID"));
         if (rlcsGuild != null)
         {
             rlcsGuild.upsertCommand(SlashType.createseries.name(), "Create RLCS Series between teams")
