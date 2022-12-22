@@ -51,24 +51,18 @@ public class ButtonCommandHandler extends ListenerAdapter {
             return;
         }
 
-        String player1 = series.getTeam(teamColour).getPlayer1().getName();
-        String player2 = series.getTeam(teamColour).getPlayer2().getName();
-        String player3 = series.getTeam(teamColour).getPlayer3().getName();
-
-        String labelAddOn = "[1]" + player1.substring(0, Math.min(player1.length(),10))
-                + " [2]" + player2.substring(0, Math.min(player2.length(),10))
-                + " [3]" + player3.substring(0, Math.min(player3.length(),10));
+        String playerNames = createPlaceholderPlayerNameLabelForOneTeam(teamColour, series);
 
         TextInput scorer = TextInput.create("scorer", "⚽ Scorer - Enter Player ID per below", TextInputStyle.SHORT)
                 .setMinLength(1)
                 .setMaxLength(1)
-                .setPlaceholder(labelAddOn)
+                .setPlaceholder(playerNames)
                 .setRequired(true)
                 .build();
 
         TextInput assister = TextInput.create("assister", "🤝 Assist - Enter Player ID per below, or 0", TextInputStyle.SHORT)
                 .setMaxLength(1)
-                .setPlaceholder(labelAddOn)
+                .setPlaceholder(playerNames)
                 .setRequired(false)
                 .build();
 
@@ -102,8 +96,7 @@ public class ButtonCommandHandler extends ListenerAdapter {
 
     private static void handleGameEvent(@NotNull ButtonInteractionEvent event)
     {
-        String originalMessage = event.getMessage().getContentRaw();
-        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
+        Series series = getSeriesFromMessage(event.getMessage());
 
         int blueGameScore = series.getGameScore().getBlueScore();
         int orangeGameScore = series.getGameScore().getOrangeScore();
@@ -129,31 +122,16 @@ public class ButtonCommandHandler extends ListenerAdapter {
             gameWinner = series.getOrangeTeam().getTeamName();
         }
 
-        String bluePlayer1 = series.getBlueTeam().getPlayer1().getName();
-        String bluePlayer2 = series.getBlueTeam().getPlayer2().getName();
-        String bluePlayer3 = series.getBlueTeam().getPlayer3().getName();
-
-        String orangePlayer1 = series.getOrangeTeam().getPlayer1().getName();
-        String orangePlayer2 = series.getOrangeTeam().getPlayer2().getName();
-        String orangePlayer3 = series.getOrangeTeam().getPlayer3().getName();
-
-
-        String labelAddOn = "[b1]" + bluePlayer1.substring(0, Math.min(bluePlayer1.length(), 10))
-                + " [b2]" + bluePlayer2.substring(0, Math.min(bluePlayer2.length(), 10))
-                + " [b3]" + bluePlayer3.substring(0, Math.min(bluePlayer3.length(), 10))
-                + System.getProperty("line.separator")
-                + "[o1]" + orangePlayer1.substring(0, Math.min(orangePlayer1.length(), 10))
-                + " [o2]" + orangePlayer2.substring(0, Math.min(orangePlayer2.length(), 10))
-                + " [o3]" + orangePlayer3.substring(0, Math.min(orangePlayer3.length(), 10));
+        String playerNames = createPlaceholderPlayerNameLabel(series);
 
         TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\" blue p1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
                 .setMinLength(5)
                 .setMaxLength(500)
-                .setPlaceholder(labelAddOn)
+                .setPlaceholder(playerNames)
                 .setRequired(false)
                 .build();
 
-        Modal modal = Modal.create("gamemodal", "Game Victory: " + gameWinner)
+        Modal modal = Modal.create(ModalType.gamemodal.name(), "Game Victory: " + gameWinner)
                 .addActionRows(ActionRow.of(commentary))
                 .build();
 
@@ -182,7 +160,7 @@ public class ButtonCommandHandler extends ListenerAdapter {
                 .setRequired(false)
                 .build();
 
-        Modal modal = Modal.create("overtimemodal", "Overtime!")
+        Modal modal = Modal.create(ModalType.overtimemodal.name(), "Overtime!")
                 .addActionRows(ActionRow.of(commentary))
                 .build();
 
@@ -192,31 +170,16 @@ public class ButtonCommandHandler extends ListenerAdapter {
     private static void handleCommentEvent(@NotNull ButtonInteractionEvent event) {
         Series series = getSeriesFromMessage(event.getMessage());
 
-        String bluePlayer1 = series.getBlueTeam().getPlayer1().getName();
-        String bluePlayer2 = series.getBlueTeam().getPlayer2().getName();
-        String bluePlayer3 = series.getBlueTeam().getPlayer3().getName();
-
-        String orangePlayer1 = series.getOrangeTeam().getPlayer1().getName();
-        String orangePlayer2 = series.getOrangeTeam().getPlayer2().getName();
-        String orangePlayer3 = series.getOrangeTeam().getPlayer3().getName();
-
-
-        String labelAddOn = "[b1]" + bluePlayer1.substring(0, Math.min(bluePlayer1.length(), 10))
-                + " [b2]" + bluePlayer2.substring(0, Math.min(bluePlayer2.length(), 10))
-                + " [b3]" + bluePlayer3.substring(0, Math.min(bluePlayer3.length(), 10))
-                + System.getProperty("line.separator")
-                + "[o1]" + orangePlayer1.substring(0, Math.min(orangePlayer1.length(), 10))
-                + " [o2]" + orangePlayer2.substring(0, Math.min(orangePlayer2.length(), 10))
-                + " [o3]" + orangePlayer3.substring(0, Math.min(orangePlayer3.length(), 10));
+        String playerNames = createPlaceholderPlayerNameLabel(series);
 
         TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\" blue p1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
                 .setMinLength(5)
                 .setMaxLength(500)
-                .setPlaceholder(labelAddOn)
+                .setPlaceholder(playerNames)
                 .setRequired(true)
                 .build();
 
-        Modal modal = Modal.create("commentmodal", "Enter Commentary")
+        Modal modal = Modal.create(ModalType.commentmodal.name(), "Enter Commentary")
                 .addActionRows(ActionRow.of(commentary))
                 .build();
 
@@ -227,5 +190,37 @@ public class ButtonCommandHandler extends ListenerAdapter {
     {
         final String originalMessage = message.getContentRaw();
         return SeriesStringParser.parseSeriesFromString(originalMessage);
+    }
+    @NotNull
+    private static String createPlaceholderPlayerNameLabelForOneTeam(TeamColour teamColour, Series series) {
+        String player1 = series.getTeam(teamColour).getPlayer1().getName();
+        String player2 = series.getTeam(teamColour).getPlayer2().getName();
+        String player3 = series.getTeam(teamColour).getPlayer3().getName();
+
+        String playerNames = "[1]" + player1.substring(0, Math.min(player1.length(),10))
+                + " [2]" + player2.substring(0, Math.min(player2.length(),10))
+                + " [3]" + player3.substring(0, Math.min(player3.length(),10));
+        return playerNames;
+    }
+
+    @NotNull
+    private static String createPlaceholderPlayerNameLabel(Series series) {
+        String bluePlayer1 = series.getBlueTeam().getPlayer1().getName();
+        String bluePlayer2 = series.getBlueTeam().getPlayer2().getName();
+        String bluePlayer3 = series.getBlueTeam().getPlayer3().getName();
+
+        String orangePlayer1 = series.getOrangeTeam().getPlayer1().getName();
+        String orangePlayer2 = series.getOrangeTeam().getPlayer2().getName();
+        String orangePlayer3 = series.getOrangeTeam().getPlayer3().getName();
+
+
+        String playerNames = "[b1]" + bluePlayer1.substring(0, Math.min(bluePlayer1.length(), 10))
+                + " [b2]" + bluePlayer2.substring(0, Math.min(bluePlayer2.length(), 10))
+                + " [b3]" + bluePlayer3.substring(0, Math.min(bluePlayer3.length(), 10))
+                + System.getProperty("line.separator")
+                + "[o1]" + orangePlayer1.substring(0, Math.min(orangePlayer1.length(), 10))
+                + " [o2]" + orangePlayer2.substring(0, Math.min(orangePlayer2.length(), 10))
+                + " [o3]" + orangePlayer3.substring(0, Math.min(orangePlayer3.length(), 10));
+        return playerNames;
     }
 }
