@@ -6,22 +6,26 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import rlcs.bot.commands.BotCommands;
+import rlcs.bot.commands.modal.ModalCommandHandler;
+import rlcs.bot.commands.button.ButtonCommandHandler;
+import rlcs.bot.commands.modal.ModalType;
+import rlcs.bot.commands.slash.SlashCommandHandler;
+import rlcs.bot.commands.slash.SlashType;
 
-public class DiscordBot {
+public class RLCSDiscordBot {
 
     public static void main(String[] args) throws InterruptedException
     {
         JDA jda = JDABuilder.createDefault("ENTER_TOKEN_HERE")
                 .setActivity(Activity.watching("RLCS"))
-                .addEventListeners(new BotCommands())
+                .addEventListeners(new SlashCommandHandler(), new ButtonCommandHandler(), new ModalCommandHandler())
                 .build()
                 .awaitReady();
 
         Guild rlcsGuild = jda.getGuildById(1048640527920271381L);
         if (rlcsGuild != null)
         {
-            rlcsGuild.upsertCommand("createseries", "Create RLCS Series between teams")
+            rlcsGuild.upsertCommand(SlashType.createseries.name(), "Create RLCS Series between teams")
                     .addOptions(
                             new OptionData(OptionType.STRING, "teamblue", "Blue team name", true),
                             new OptionData(OptionType.STRING, "teamorange", "Orange team name", true),
@@ -40,11 +44,11 @@ public class DiscordBot {
                             new OptionData(OptionType.STRING, "orangeplayer3", "Orange player 3", true)
                     ).queue();
 
-            rlcsGuild.upsertCommand("bluegoalmodal", "Goal for Blue team").queue();
-            rlcsGuild.upsertCommand("orangegoalmodal", "Goal for Orange team").queue();
-            rlcsGuild.upsertCommand("gamemodal", "End Game").queue();
-            rlcsGuild.upsertCommand("overtimemodal", "Enter Overtime").queue();
-            rlcsGuild.upsertCommand("commentmodal", "Enter Comment").queue();
+            rlcsGuild.upsertCommand(ModalType.goalbluemodal.name(), "Goal for Blue team").queue();
+            rlcsGuild.upsertCommand(ModalType.goalorangemodal.name(), "Goal for Orange team").queue();
+            rlcsGuild.upsertCommand(ModalType.gamemodal.name(), "End Game").queue();
+            rlcsGuild.upsertCommand(ModalType.overtimemodal.name(), "Enter Overtime").queue();
+            rlcsGuild.upsertCommand(ModalType.commentmodal.name(), "Enter Comment").queue();
         }
     }
 
