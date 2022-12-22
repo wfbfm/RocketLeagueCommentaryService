@@ -12,8 +12,7 @@ public class SlashCommandHandler extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event)
     {
-        // TODO: Replace this with environment variable.  Add check on role or leave permissioning Discord-server side?
-        if (event.getChannel().getIdLong() != 1049856241754705950L)
+        if (event.getChannel().getId() != System.getenv("COMMAND_CHANNEL"))
         {
             event.reply("Commentary commands can only be used in the #rlcs-mission-control channel " +
                     "by users with the Commentator role").setEphemeral(true).queue();
