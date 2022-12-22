@@ -1,34 +1,11 @@
 package rlcs.series;
 
-public class SeriesActions
+public final class SeriesStringParser
 {
     private static final int ACCEPTABLE_CHAR_LENGTH = 40;
     private static final int ACCEPTABLE_TEAM_LENGTH = 16;
-    public void uptickSeriesWithGoal(Series series, TeamColour teamColour)
-    {
-        if (teamColour == TeamColour.BLUE)
-        {
-            series.getGameScore().setBlueScore(series.getGameScore().getBlueScore() + 1);
-        }
-        if (teamColour == TeamColour.ORANGE)
-        {
-            series.getGameScore().setOrangeScore(series.getGameScore().getOrangeScore() + 1);
-        }
-    }
 
-    public void uptickSeriesWithGame(Series series, TeamColour teamColour)
-    {
-        if (teamColour == TeamColour.BLUE)
-        {
-            series.getSeriesScore().setBlueScore(series.getSeriesScore().getBlueScore() + 1);
-        }
-        if (teamColour == TeamColour.ORANGE)
-        {
-            series.getSeriesScore().setOrangeScore(series.getSeriesScore().getOrangeScore() + 1);
-        }
-    }
-
-    public String generateHeaderString(Series series)
+    public static String generateHeaderString(Series series)
     {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("S");
@@ -43,7 +20,7 @@ public class SeriesActions
         return stringBuilder.toString();
     }
 
-    public String generateGameScoreString(Series series)
+    public static String generateGameScoreString(Series series)
     {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("**");
@@ -69,7 +46,7 @@ public class SeriesActions
         return stringBuilder.toString();
     }
 
-    public String generateSeriesScoreString(Series series)
+    public static String generateSeriesScoreString(Series series)
     {
         int targetLength = generateGameScoreString(series).length();
 
@@ -97,7 +74,7 @@ public class SeriesActions
         }
         return stringBuilder.toString();
     }
-    public String generatePlayerString(Series series, TeamColour teamColour)
+    public static String generatePlayerString(Series series, TeamColour teamColour)
     {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -128,13 +105,13 @@ public class SeriesActions
         return stringBuilder.toString();
     }
 
-    public String generateOvertimeString(Series series)
+    public static String generateOvertimeString(Series series)
     {
         String overtimeString = "Overtime: " + series.isOvertime();
         return overtimeString;
     }
 
-    public String generateSeriesString(Series series)
+    public static String generateSeriesString(Series series)
     {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(generateHeaderString(series));
@@ -152,7 +129,7 @@ public class SeriesActions
         return stringBuilder.toString();
     }
 
-    public Series parseSeriesFromString(String string)
+    public static Series parseSeriesFromString(String string)
     {
         String[] lines = string.split(System.getProperty("line.separator"));
         String headerString = lines[0];
