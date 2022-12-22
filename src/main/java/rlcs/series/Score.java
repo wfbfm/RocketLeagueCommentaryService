@@ -31,4 +31,16 @@ public class Score
     {
         this.orangeScore = orangeScore;
     }
+
+    public int getTeamScore(final TeamColour teamColour)
+    {
+        if (teamColour == TeamColour.BLUE)
+        {
+            return this.blueScore;
+        }
+        else
+        {
+            return this.orangeScore;
+        }
+    }
 }

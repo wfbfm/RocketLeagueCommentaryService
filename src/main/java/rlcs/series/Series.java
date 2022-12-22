@@ -66,6 +66,18 @@ public class Series
         this.seriesScore = seriesScore;
     }
 
+    public Team getTeam(TeamColour teamColour)
+    {
+        if (teamColour == TeamColour.BLUE)
+        {
+            return this.blueTeam;
+        }
+        else
+        {
+            return this.orangeTeam;
+        }
+    }
+
     public Team getBlueTeam()
     {
         return blueTeam;
