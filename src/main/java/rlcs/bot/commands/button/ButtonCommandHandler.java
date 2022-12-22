@@ -16,7 +16,8 @@ import rlcs.series.TeamColour;
 public class ButtonCommandHandler extends ListenerAdapter {
 
     @Override
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event)
+    {
         try {
             switch (ButtonType.valueOf(event.getButton().getId()))
             {
@@ -45,6 +46,7 @@ public class ButtonCommandHandler extends ListenerAdapter {
     {
         Series series = getSeriesFromMessage(event.getMessage());
 
+        // TODO: Support double-digit scores, this is lazy
         if (series.getGameScore().getTeamScore(teamColour) >= 9)
         {
             event.reply("Sorry - only single digit goals.  Please raise a Jira™️").setEphemeral(true).queue();
@@ -167,7 +169,8 @@ public class ButtonCommandHandler extends ListenerAdapter {
         event.replyModal(modal).queue();
     }
 
-    private static void handleCommentEvent(@NotNull ButtonInteractionEvent event) {
+    private static void handleCommentEvent(@NotNull ButtonInteractionEvent event)
+    {
         Series series = getSeriesFromMessage(event.getMessage());
 
         String playerNames = createPlaceholderPlayerNameLabel(series);
@@ -192,19 +195,21 @@ public class ButtonCommandHandler extends ListenerAdapter {
         return SeriesStringParser.parseSeriesFromString(originalMessage);
     }
     @NotNull
-    private static String createPlaceholderPlayerNameLabelForOneTeam(TeamColour teamColour, Series series) {
+    private static String createPlaceholderPlayerNameLabelForOneTeam(TeamColour teamColour, Series series)
+    {
         String player1 = series.getTeam(teamColour).getPlayer1().getName();
         String player2 = series.getTeam(teamColour).getPlayer2().getName();
         String player3 = series.getTeam(teamColour).getPlayer3().getName();
 
-        String playerNames = "[1]" + player1.substring(0, Math.min(player1.length(),10))
-                + " [2]" + player2.substring(0, Math.min(player2.length(),10))
-                + " [3]" + player3.substring(0, Math.min(player3.length(),10));
+        String playerNames = "[1]" + player1.substring(0, Math.min(player1.length(), 10))
+                + " [2]" + player2.substring(0, Math.min(player2.length(), 10))
+                + " [3]" + player3.substring(0, Math.min(player3.length(), 10));
         return playerNames;
     }
 
     @NotNull
-    private static String createPlaceholderPlayerNameLabel(Series series) {
+    private static String createPlaceholderPlayerNameLabel(Series series)
+    {
         String bluePlayer1 = series.getBlueTeam().getPlayer1().getName();
         String bluePlayer2 = series.getBlueTeam().getPlayer2().getName();
         String bluePlayer3 = series.getBlueTeam().getPlayer3().getName();

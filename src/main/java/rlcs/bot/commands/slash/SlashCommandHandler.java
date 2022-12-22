@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
+import rlcs.bot.commands.button.ButtonType;
 import rlcs.series.*;
 
 public class SlashCommandHandler extends ListenerAdapter {
@@ -11,6 +12,14 @@ public class SlashCommandHandler extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event)
     {
+        // TODO: Replace this with environment variable.  Add check on role or leave permissioning Discord-server side?
+        if (event.getChannel().getIdLong() != 1049856241754705950L)
+        {
+            event.reply("Commentary commands can only be used in the #rlcs-mission-control channel " +
+                    "by users with the Commentator role").setEphemeral(true).queue();
+            return;
+        }
+
         if (event.getName().equals(String.valueOf(SlashType.createseries)))
         {
             handleCreateSeriesEvent(event);
@@ -61,11 +70,11 @@ public class SlashCommandHandler extends ListenerAdapter {
 
         event.getHook().sendMessage(SeriesStringParser.generateSeriesString(series))
                 .setActionRow(
-                        Button.primary("goalblue", "⚽ " + blueTeam.getTeamName()),
-                        Button.danger("goalorange", "⚽ " + orangeTeam.getTeamName()),
-                        Button.success("game", "🏁 Game"),
-                        Button.secondary("overtime", "🕒 Overtime"),
-                        Button.secondary("comment", "💬 Comment"))
+                        Button.primary(ButtonType.goalblue.name(), "⚽ " + blueTeam.getTeamName()),
+                        Button.danger(ButtonType.goalorange.name(), "⚽ " + orangeTeam.getTeamName()),
+                        Button.success(ButtonType.game.name(), "🏁 Game"),
+                        Button.secondary(ButtonType.overtime.name(), "🕒 Overtime"),
+                        Button.secondary(ButtonType.comment.name(), "💬 Comment"))
                 .queue();
     }
 }

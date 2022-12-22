@@ -16,6 +16,7 @@ public class RLCSDiscordBot {
 
     public static void main(String[] args) throws InterruptedException
     {
+        // TODO: Add environment variable for token; guild id
         JDA jda = JDABuilder.createDefault("ENTER_TOKEN_HERE")
                 .setActivity(Activity.watching("RLCS"))
                 .addEventListeners(new SlashCommandHandler(), new ButtonCommandHandler(), new ModalCommandHandler())
