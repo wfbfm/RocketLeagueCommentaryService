@@ -15,7 +15,6 @@ import rlcs.series.*;
 
 public class BotCommands extends ListenerAdapter
 {
-    private static SeriesActions seriesActions = new SeriesActions();
     public BotCommands()
     {
 
@@ -83,7 +82,7 @@ public class BotCommands extends ListenerAdapter
     private static void handleGoalBlueModalEvent(@NotNull ModalInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         String scorer = event.getValue("scorer").getAsString();
         String assister = event.getValue("assister").getAsString();
@@ -100,7 +99,7 @@ public class BotCommands extends ListenerAdapter
 
         series.setOvertime(false);
         series.setMessageCount(series.getMessageCount() + 1);
-        String updatedSeriesTemplateString = seriesActions.generateSeriesString(series);
+        String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
 
 
         TextChannel publishChannel = event.getJDA().getTextChannelById(1049857570581516348L);
@@ -183,7 +182,7 @@ public class BotCommands extends ListenerAdapter
     private static void handleGoalOrangeModalEvent(@NotNull ModalInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         String scorer = event.getValue("scorer").getAsString();
         String assister = event.getValue("assister").getAsString();
@@ -200,7 +199,7 @@ public class BotCommands extends ListenerAdapter
 
         series.setOvertime(false);
         series.setMessageCount(series.getMessageCount() + 1);
-        String updatedSeriesTemplateString = seriesActions.generateSeriesString(series);
+        String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
 
 
         TextChannel publishChannel = event.getJDA().getTextChannelById(1049857570581516348L);
@@ -283,7 +282,7 @@ public class BotCommands extends ListenerAdapter
     private static void handleGameModalEvent(@NotNull ModalInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         int blueGameScore = series.getGameScore().getBlueScore();
         int orangeGameScore = series.getGameScore().getOrangeScore();
@@ -301,7 +300,7 @@ public class BotCommands extends ListenerAdapter
         series.setOvertime(false);
         series.getGameScore().setBlueScore(0);
         series.getGameScore().setOrangeScore(0);
-        String updatedSeriesTemplateString = seriesActions.generateSeriesString(series);
+        String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
 
 
 
@@ -355,11 +354,11 @@ public class BotCommands extends ListenerAdapter
     private static void handleOvertimeModalEvent(@NotNull ModalInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         series.setOvertime(true);
         series.setMessageCount(series.getMessageCount() + 1);
-        String updatedSeriesTemplateString = seriesActions.generateSeriesString(series);
+        String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
 
         String commentary = event.getValue("commentary").getAsString();
 
@@ -411,10 +410,10 @@ public class BotCommands extends ListenerAdapter
     private static void handleCommentModalEvent(@NotNull ModalInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         series.setMessageCount(series.getMessageCount() + 1);
-        String updatedSeriesTemplateString = seriesActions.generateSeriesString(series);
+        String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
 
         String commentary = event.getValue("commentary").getAsString();
 
@@ -505,7 +504,7 @@ public class BotCommands extends ListenerAdapter
                 false
                 );
 
-        event.getHook().sendMessage(new SeriesActions().generateSeriesString(series))
+        event.getHook().sendMessage(new SeriesStringParser().generateSeriesString(series))
                 .setActionRow(
                         Button.primary("goalblue", "⚽ " + blueTeam.getTeamName()),
                         Button.danger("goalorange", "⚽ " + orangeTeam.getTeamName()),
@@ -518,7 +517,7 @@ public class BotCommands extends ListenerAdapter
     private static void handleCommentEvent(@NotNull ButtonInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         String bluePlayer1 = series.getBlueTeam().getPlayer1().getName();
         String bluePlayer2 = series.getBlueTeam().getPlayer2().getName();
@@ -554,7 +553,7 @@ public class BotCommands extends ListenerAdapter
     private static void handleGoalBlueEvent(@NotNull ButtonInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         if (series.getGameScore().getBlueScore() >= 9)
         {
@@ -605,7 +604,7 @@ public class BotCommands extends ListenerAdapter
     private static void handleGoalOrangeEvent(@NotNull ButtonInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         if (series.getGameScore().getOrangeScore() >= 9)
         {
@@ -656,7 +655,7 @@ public class BotCommands extends ListenerAdapter
     private static void handleGameEvent(@NotNull ButtonInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         int blueGameScore = series.getGameScore().getBlueScore();
         int orangeGameScore = series.getGameScore().getOrangeScore();
@@ -717,7 +716,7 @@ public class BotCommands extends ListenerAdapter
     private static void handleOvertimeEvent(@NotNull ButtonInteractionEvent event)
     {
         String originalMessage = event.getMessage().getContentRaw();
-        Series series = seriesActions.parseSeriesFromString(originalMessage);
+        Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
         int blueGameScore = series.getGameScore().getBlueScore();
         int orangeGameScore = series.getGameScore().getOrangeScore();
