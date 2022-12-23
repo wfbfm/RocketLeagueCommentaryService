@@ -80,7 +80,7 @@ public class ModalCommandHandler extends ListenerAdapter
                 publishStringBuilder.append("🕒 " + gameTime);
             }
         }
-
+        // linebreak between goal details and commentary
         publishStringBuilder.append(System.getProperty("line.separator"));
 
         if (commentary != null)
@@ -169,7 +169,8 @@ public class ModalCommandHandler extends ListenerAdapter
     private static StringBuilder createStringBuilderFromSeries(final String updatedSeriesTemplateString)
     {
         String[] lines = updatedSeriesTemplateString.split(System.getProperty("line.separator"));
-        StringBuilder publishStringBuilder = new StringBuilder(System.getProperty("line.separator"));
+        // "_ _" gives a line break at the top of the message, when displayed in Discord
+        StringBuilder publishStringBuilder = new StringBuilder("_ _");
         publishStringBuilder.append(System.getProperty("line.separator"));
         // only loop over certain lines because we don't want to publish player names/overtime flag in the final commentary
         for (int i = 0; i < 3; i++)
@@ -212,8 +213,6 @@ public class ModalCommandHandler extends ListenerAdapter
         String orangePlayer1 = series.getOrangeTeam().getPlayer1().getName();
         String orangePlayer2 = series.getOrangeTeam().getPlayer2().getName();
         String orangePlayer3 = series.getOrangeTeam().getPlayer3().getName();
-
-        publishStringBuilder.append(System.getProperty("line.separator"));
 
         if (commentary != null)
         {
