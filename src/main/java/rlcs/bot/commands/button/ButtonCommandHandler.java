@@ -9,11 +9,20 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 import rlcs.bot.commands.modal.ModalType;
+import rlcs.bot.commands.twitch.TwitchClipper;
+import rlcs.bot.commands.twitch.TwitchStatus;
 import rlcs.series.Series;
 import rlcs.series.SeriesStringParser;
 import rlcs.series.TeamColour;
 
 public class ButtonCommandHandler extends ListenerAdapter {
+
+    private static TwitchClipper twitchClipper;
+
+    public ButtonCommandHandler(final TwitchClipper twitchClipper)
+    {
+        this.twitchClipper = twitchClipper;
+    }
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event)
@@ -35,6 +44,12 @@ public class ButtonCommandHandler extends ListenerAdapter {
                     return;
                 case comment:
                     handleCommentEvent(event);
+                    return;
+                case twitchclip:
+                    handleTwitchClipEvent(event);
+                    return;
+                case removetwitchclip:
+                    handleRemoveTwitchClipEvent(event);
                     return;
             }
         } catch (IllegalArgumentException e) {
@@ -187,6 +202,50 @@ public class ButtonCommandHandler extends ListenerAdapter {
                 .build();
 
         event.replyModal(modal).queue();
+    }
+
+    private static void handleTwitchClipEvent(@NotNull ButtonInteractionEvent event)
+    {
+        Series series = getSeriesFromMessage(event.getMessage());
+        // Defer a reply to this event - as clip creation takes time
+        event.deferReply().setEphemeral(true).queue();
+
+        if (series.getTwitchBroadcasterId().equals(TwitchStatus.TWITCH_USER_NOT_FOUND.name()))
+        {
+            event.getHook().sendMessage("Sorry - the twitch user of this series " + series.getTwitchName() + " wasn't recognised, so I can't create a clip!").setEphemeral(true).queue();
+            return;
+        }
+
+        String twitchClipId;
+        try {
+            twitchClipId = twitchClipper.createClipAndReturnClipId(series.getTwitchBroadcasterId());
+        } catch (RuntimeException e)
+        {
+            event.getHook().sendMessage("Sorry - I was unable to create a Twitch clip for " + series.getTwitchName() + "!  " +
+                    "The channel " + series.getTwitchName() + " may not support clips - or clipping may be allowed only for followers/subscribers").setEphemeral(true).queue();
+            return;
+        }
+
+        if (twitchClipId.equals(TwitchStatus.UNABLE_TO_CREATE_CLIP.name()))
+        {
+            event.getHook().sendMessage("Sorry - I was unable to create a Twitch clip for " + series.getTwitchName() + "!  " +
+                    "The channel " + series.getTwitchName() + " may not support clips - or clipping may be allowed only for followers/subscribers").setEphemeral(true).queue();
+            return;
+        }
+
+        // uptick the series twitch clip ID, and edit the message
+        series.setTwitchClipId(twitchClipId);
+        event.getMessage().editMessage(SeriesStringParser.generateSeriesString(series)).queue();
+        // delete the deferred reply
+        event.getHook().deleteOriginal().queue();
+    }
+
+    private static void handleRemoveTwitchClipEvent(@NotNull ButtonInteractionEvent event)
+    {
+        Series series = getSeriesFromMessage(event.getMessage());
+        // uptick the series with NONE twitch clip ID, and edit the message
+        series.setTwitchClipId("None");
+        event.editMessage(SeriesStringParser.generateSeriesString(series)).queue();
     }
 
     private static Series getSeriesFromMessage(final Message message)

@@ -12,8 +12,12 @@ public class Series
 
     private int bestOf;
     private boolean overtime;
+    private String twitchName;
+    private String twitchBroadcasterId;
 
-    public Series(int seriesId, int messageCount, Score gameScore, Score seriesScore, Team blueTeam, Team orangeTeam, int bestOf, boolean overtime)
+    private String twitchClipId;
+
+    public Series(int seriesId, int messageCount, Score gameScore, Score seriesScore, Team blueTeam, Team orangeTeam, int bestOf, boolean overtime, String twitchName, String twitchBroadcasterId, String twitchClipId)
     {
         this.seriesId = seriesId;
         this.messageCount = messageCount;
@@ -22,7 +26,10 @@ public class Series
         this.blueTeam = blueTeam;
         this.orangeTeam = orangeTeam;
         this.bestOf = bestOf;
-        this.overtime = false;
+        this.overtime = overtime;
+        this.twitchName = twitchName;
+        this.twitchBroadcasterId = twitchBroadcasterId;
+        this.twitchClipId = twitchClipId;
     }
 
 
@@ -116,5 +123,35 @@ public class Series
     public void setOvertime(boolean overtime)
     {
         this.overtime = overtime;
+    }
+
+    public String getTwitchName()
+    {
+        return twitchName;
+    }
+
+    public void setTwitchName(final String twitchName)
+    {
+        this.twitchName = twitchName;
+    }
+
+    public String getTwitchBroadcasterId()
+    {
+        return twitchBroadcasterId;
+    }
+
+    public void setTwitchBroadcasterId(final String twitchBroadcasterId)
+    {
+        this.twitchBroadcasterId = twitchBroadcasterId;
+    }
+
+    public String getTwitchClipId()
+    {
+        return twitchClipId;
+    }
+
+    public void setTwitchClipId(final String twitchClipId)
+    {
+        this.twitchClipId = twitchClipId;
     }
 }
