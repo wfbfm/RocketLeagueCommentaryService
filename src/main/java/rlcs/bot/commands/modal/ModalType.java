@@ -5,5 +5,6 @@ public enum ModalType {
     goalorangemodal,
     gamemodal,
     overtimemodal,
-    commentmodal
+    commentmodal,
+    editscoremodal
 }

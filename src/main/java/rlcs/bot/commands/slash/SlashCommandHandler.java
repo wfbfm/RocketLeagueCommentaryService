@@ -97,19 +97,23 @@ public class SlashCommandHandler extends ListenerAdapter {
                             Button.secondary(ButtonType.comment.name(), "💬 Comment"))
                     .addActionRow(
                             Button.primary(ButtonType.twitchclip.name(), "🎬 Generate Twitch Clip for Next Message"),
-                            Button.danger(ButtonType.removetwitchclip.name(), "❌ Remove Clip")
+                            Button.danger(ButtonType.removetwitchclip.name(), "❌ Remove Clip"),
+                            Button.secondary(ButtonType.editscore.name(), "📝 Edit Score")
                     )
                     .queue();
         }
         else
         {
             event.getHook().sendMessage(SeriesStringParser.generateSeriesString(series))
-                    .setActionRow(
+                    .addActionRow(
                             Button.primary(ButtonType.goalblue.name(), "⚽ " + blueTeam.getTeamName()),
                             Button.danger(ButtonType.goalorange.name(), "⚽ " + orangeTeam.getTeamName()),
                             Button.success(ButtonType.game.name(), "🏁 Game"),
                             Button.secondary(ButtonType.overtime.name(), "🕒 Overtime"),
                             Button.secondary(ButtonType.comment.name(), "💬 Comment"))
+                    .addActionRow(
+                            Button.secondary(ButtonType.editscore.name(), "📝 Edit Score")
+                    )
                     .queue();
         }
     }

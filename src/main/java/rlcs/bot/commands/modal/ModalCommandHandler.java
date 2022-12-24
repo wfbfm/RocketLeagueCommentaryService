@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rlcs.bot.commands.twitch.TwitchClipper;
 import rlcs.bot.commands.twitch.TwitchStatus;
+import rlcs.series.Score;
 import rlcs.series.Series;
 import rlcs.series.SeriesStringParser;
 import rlcs.series.TeamColour;
@@ -42,6 +43,9 @@ public class ModalCommandHandler extends ListenerAdapter
                     return;
                 case commentmodal:
                     handleCommentModalEvent(event);
+                    return;
+                case editscoremodal:
+                    handleEditScoreModalEvent(event);
                     return;
             }
         }
@@ -166,6 +170,51 @@ public class ModalCommandHandler extends ListenerAdapter
 
         extractAndFormatCommentary(event, series, publishStringBuilder);
         editAndPublishFinalMessages(event, twitchClipId, updatedSeriesTemplateString, publishStringBuilder);
+    }
+
+    private static void handleEditScoreModalEvent(@NotNull ModalInteractionEvent event)
+    {
+        Series series = getSeriesFromMessageAndUptickMessageCount(event.getMessage());
+        // Defer a reply to the event - this lets people know the bot is busy
+        event.deferReply().setEphemeral(true).queue();
+        try {
+            int bestOf = Integer.parseInt(event.getValue("bestof").getAsString());
+            int blueSeriesScore = Integer.parseInt(event.getValue("blueseriesscore").getAsString());
+            int orangeSeriesScore = Integer.parseInt(event.getValue("orangeseriesscore").getAsString());
+            int blueGameScore = Integer.parseInt(event.getValue("bluegamescore").getAsString());
+            int orangeGameScore = Integer.parseInt(event.getValue("orangegamescore").getAsString());
+
+            series.setBestOf(bestOf);
+            Score seriesScore = series.getSeriesScore();
+            seriesScore.setBlueScore(blueSeriesScore);
+            seriesScore.setOrangeScore(orangeSeriesScore);
+            series.setSeriesScore(seriesScore);
+            Score gameScore = series.getGameScore();
+            gameScore.setBlueScore(blueGameScore);
+            gameScore.setOrangeScore(orangeGameScore);
+            series.setGameScore(gameScore);
+        } catch (NumberFormatException e)
+        {
+            event.getHook().sendMessage("Invalid score attributes passed through Edit Score - these must be integers").setEphemeral(true).queue();
+            return;
+        }
+        if (series.getBestOf() % 2 == 0)
+        {
+            event.getHook().sendMessage("Series can only be Best Of an ODD number - i.e. not " + series.getBestOf()).setEphemeral(true).queue();
+            return;
+        }
+        int maxScore = (series.getBestOf() + 1) / 2;
+        if (series.getSeriesScore().getBlueScore() > maxScore || series.getSeriesScore().getOrangeScore() > maxScore)
+        {
+            event.getHook().sendMessage("In a best of " + series.getBestOf() + ", the max series score allowed is " + maxScore).setEphemeral(true).queue();
+            return;
+        }
+
+        String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
+        // Edits the template message in the command channel
+        event.getMessage().editMessage(updatedSeriesTemplateString).queue();
+        // Deletes the deferred reply, as the bot is no longer busy
+        event.getHook().deleteOriginal().queue();
     }
 
     private static Series getSeriesFromMessageAndUptickMessageCount(final Message message)

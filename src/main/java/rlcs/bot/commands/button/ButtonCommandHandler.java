@@ -51,6 +51,9 @@ public class ButtonCommandHandler extends ListenerAdapter {
                 case removetwitchclip:
                     handleRemoveTwitchClipEvent(event);
                     return;
+                case editscore:
+                    handleEditScoreEvent(event);
+                    return;
             }
         } catch (IllegalArgumentException e) {
             event.reply("Unrecognised button press").setEphemeral(true).queue();
@@ -246,6 +249,54 @@ public class ButtonCommandHandler extends ListenerAdapter {
         // uptick the series with NONE twitch clip ID, and edit the message
         series.setTwitchClipId("None");
         event.editMessage(SeriesStringParser.generateSeriesString(series)).queue();
+    }
+
+    private static void handleEditScoreEvent(@NotNull ButtonInteractionEvent event)
+    {
+        // allows users to change orange/blue game/series scores, and bestOf amount
+        Series series = getSeriesFromMessage(event.getMessage());
+
+        TextInput bestOf = TextInput.create("bestof", "Series: Best of <X> Games", TextInputStyle.SHORT)
+                .setMinLength(1)
+                .setMaxLength(1)
+                .setValue(String.valueOf(series.getBestOf()))
+                .setRequired(true)
+                .build();
+
+        TextInput blueSeriesScore = TextInput.create("blueseriesscore", series.getBlueTeam().getTeamName() + " SERIES Score", TextInputStyle.SHORT)
+                .setMinLength(1)
+                .setMaxLength(1)
+                .setValue(String.valueOf(series.getSeriesScore().getBlueScore()))
+                .setRequired(true)
+                .build();
+
+        TextInput orangeSeriesScore = TextInput.create("orangeseriesscore", series.getOrangeTeam().getTeamName() + " SERIES Score", TextInputStyle.SHORT)
+                .setMinLength(1)
+                .setMaxLength(1)
+                .setValue(String.valueOf(series.getSeriesScore().getOrangeScore()))
+                .setRequired(true)
+                .build();
+
+        TextInput blueGameScore = TextInput.create("bluegamescore", series.getBlueTeam().getTeamName() + " GAME Score", TextInputStyle.SHORT)
+                .setMinLength(1)
+                .setMaxLength(1)
+                .setValue(String.valueOf(series.getGameScore().getBlueScore()))
+                .setRequired(true)
+                .build();
+
+        TextInput orangeGameScore = TextInput.create("orangegamescore", series.getOrangeTeam().getTeamName() + " GAME Score", TextInputStyle.SHORT)
+                .setMinLength(1)
+                .setMaxLength(1)
+                .setValue(String.valueOf(series.getGameScore().getOrangeScore()))
+                .setRequired(true)
+                .build();
+
+        Modal modal = Modal.create(ModalType.editscoremodal.name(), "Enter Series & Game Scores")
+                .addActionRows(ActionRow.of(bestOf), ActionRow.of(blueSeriesScore), ActionRow.of(orangeSeriesScore),
+                        ActionRow.of(blueGameScore), ActionRow.of(orangeGameScore))
+                .build();
+
+        event.replyModal(modal).queue();
     }
 
     private static Series getSeriesFromMessage(final Message message)
