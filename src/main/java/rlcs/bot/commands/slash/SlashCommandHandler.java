@@ -82,6 +82,7 @@ public class SlashCommandHandler extends ListenerAdapter {
                 false,
                 twitchName,
                 twitchBroadcasterId,
+                "None",
                 "None"
         );
 

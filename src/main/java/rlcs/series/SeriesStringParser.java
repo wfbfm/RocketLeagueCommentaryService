@@ -129,6 +129,12 @@ public final class SeriesStringParser
         return twitchClipId;
     }
 
+    public static String generateCommentatorString(Series series)
+    {
+        String commentator = "Current Commentator: " + series.getCommentator();
+        return commentator;
+    }
+
     public static String generateSeriesString(Series series)
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -150,6 +156,8 @@ public final class SeriesStringParser
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(generateTwitchClipIdString(series));
         stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(generateCommentatorString(series));
+        stringBuilder.append(System.getProperty("line.separator"));
         return stringBuilder.toString();
     }
 
@@ -165,6 +173,7 @@ public final class SeriesStringParser
         String twitchNameString = lines[6];
         String twitchBroadcasterString = lines[7];
         String twitchClipIdString = lines[8];
+        String commentatorString = lines[9];
 
         // parse header
         String[] parsedHeaderString = headerString.split("-");
@@ -213,6 +222,9 @@ public final class SeriesStringParser
         // parse twitchClipId
         String twitchClipId = twitchClipIdString.split("Twitch Clip ID for next message: ")[1];
 
+        // parse commentator
+        String commentator = commentatorString.split("Current Commentator: ")[1];
+
         Team blueTeam = new Team(blueTeamName,
                 new Player(bluePlayer1),
                 new Player(bluePlayer2),
@@ -235,7 +247,8 @@ public final class SeriesStringParser
                 overtime,
                 twitchName,
                 twitchBroadcaster,
-                twitchClipId
+                twitchClipId,
+                commentator
         );
 
         return series;
