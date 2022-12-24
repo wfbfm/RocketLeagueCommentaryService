@@ -215,7 +215,8 @@ public class ButtonCommandHandler extends ListenerAdapter {
 
         if (twitchClipId.equals(TwitchStatus.UNABLE_TO_CREATE_CLIP.name()))
         {
-            event.reply("Sorry - I was unable to create a Twitch clip for " + series.getTwitchName() + "!").setEphemeral(true).queue();
+            event.reply("Sorry - I was unable to create a Twitch clip for " + series.getTwitchName() + "!  " +
+                    "The channel " + series.getTwitchName() + " may not support clips - or clipping may be allowed only for followers/subscribers").setEphemeral(true).queue();
             return;
         }
 

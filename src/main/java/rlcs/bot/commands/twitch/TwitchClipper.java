@@ -25,13 +25,12 @@ public class TwitchClipper
                 .build();
     }
 
-    public String getBroadcasterIdForTwitchName(final String twitchName)
+    public String parseTwitchName(final String twitchName)
     {
         if (!StringUtils.isNotEmpty(twitchName))
         {
-            return TwitchStatus.TWITCH_USER_NOT_FOUND.name();
+            return "None";
         }
-
         String parsedTwitchName;
         if (twitchName.contains("twitch.tv"))
         {
@@ -41,8 +40,17 @@ public class TwitchClipper
         {
             parsedTwitchName = twitchName.replace("/", "").toLowerCase();
         }
+        return parsedTwitchName;
+    }
 
-        UserList userList = twitchClient.getHelix().getUsers(null, null, Arrays.asList(parsedTwitchName)).execute();
+    public String getBroadcasterIdForTwitchName(final String twitchName)
+    {
+        if (!StringUtils.isNotEmpty(twitchName))
+        {
+            return TwitchStatus.TWITCH_USER_NOT_FOUND.name();
+        }
+
+        UserList userList = twitchClient.getHelix().getUsers(null, null, Arrays.asList(twitchName)).execute();
         if (userList.getUsers().size() > 0)
         {
             return userList.getUsers().get(0).getId();

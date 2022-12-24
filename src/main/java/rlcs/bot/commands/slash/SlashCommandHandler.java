@@ -56,7 +56,7 @@ public class SlashCommandHandler extends ListenerAdapter {
         String twitchBroadcasterId = TwitchStatus.TWITCH_USER_NOT_FOUND.name();
         if (event.getOption("twitchchannel") != null)
         {
-            twitchName = event.getOption("twitchchannel").getAsString();
+            twitchName = twitchClipper.parseTwitchName(event.getOption("twitchchannel").getAsString());
             twitchBroadcasterId = twitchClipper.getBroadcasterIdForTwitchName(twitchName);
         }
 

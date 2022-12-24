@@ -55,6 +55,8 @@ public class ModalCommandHandler extends ListenerAdapter
     {
         Series series = getSeriesFromMessageAndUptickMessageCount(event.getMessage());
         String twitchClipId = getAndResetTwitchClipIdForPublishing(series);
+        // Defer a reply to the event - this lets people know the bot is busy
+        event.deferReply().setEphemeral(true).queue();
 
         String scorer = event.getValue("scorer").getAsString();
         String assister = event.getValue("assister").getAsString();
@@ -63,7 +65,7 @@ public class ModalCommandHandler extends ListenerAdapter
 
         if (scorer.equals(assister))
         {
-            event.reply("The same player cannot score and assist the same goal").setEphemeral(true).queue();
+            event.getHook().sendMessage("The same player cannot score and assist a goal").setEphemeral(true).queue();
             return;
         }
         // uptick the game score, set the overtime to false
@@ -72,7 +74,6 @@ public class ModalCommandHandler extends ListenerAdapter
 
         // Original holder message will be updated with series template string
         String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
-        event.editMessage(updatedSeriesTemplateString).queue();
         // Publish string will be posted in the commentary channel with additional attributes
         StringBuilder publishStringBuilder = createStringBuilderFromSeries(updatedSeriesTemplateString);
 
@@ -102,13 +103,15 @@ public class ModalCommandHandler extends ListenerAdapter
 
             publishStringBuilder.append(commentary);
         }
-        publishCommentaryMessage(event, publishStringBuilder, twitchClipId);
+        editAndPublishFinalMessages(event, twitchClipId, updatedSeriesTemplateString, publishStringBuilder);
     }
 
     private static void handleGameModalEvent(@NotNull ModalInteractionEvent event)
     {
         Series series = getSeriesFromMessageAndUptickMessageCount(event.getMessage());
         String twitchClipId = getAndResetTwitchClipIdForPublishing(series);
+        // Defer a reply to the event - this lets people know the bot is busy
+        event.deferReply().setEphemeral(true).queue();
 
         int blueGameScore = series.getGameScore().getBlueScore();
         int orangeGameScore = series.getGameScore().getOrangeScore();
@@ -129,41 +132,40 @@ public class ModalCommandHandler extends ListenerAdapter
         series.getGameScore().setOrangeScore(0);
 
         String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
-        event.editMessage(updatedSeriesTemplateString).queue();
-
         StringBuilder publishStringBuilder = createStringBuilderFromSeries(updatedSeriesTemplateString);
 
         extractAndFormatCommentary(event, series, publishStringBuilder);
-        publishCommentaryMessage(event, publishStringBuilder, twitchClipId);
+        editAndPublishFinalMessages(event, twitchClipId, updatedSeriesTemplateString, publishStringBuilder);
     }
 
     private static void handleOvertimeModalEvent(@NotNull ModalInteractionEvent event)
     {
         Series series = getSeriesFromMessageAndUptickMessageCount(event.getMessage());
         String twitchClipId = getAndResetTwitchClipIdForPublishing(series);
+        // Defer a reply to the event - this lets people know the bot is busy
+        event.deferReply().setEphemeral(true).queue();
 
         series.setOvertime(true);
         String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
-        event.editMessage(updatedSeriesTemplateString).queue();
 
         StringBuilder publishStringBuilder = createStringBuilderFromSeries(updatedSeriesTemplateString);
 
         extractAndFormatCommentary(event, series, publishStringBuilder);
-        publishCommentaryMessage(event, publishStringBuilder, twitchClipId);
+        editAndPublishFinalMessages(event, twitchClipId, updatedSeriesTemplateString, publishStringBuilder);
     }
 
     private static void handleCommentModalEvent(@NotNull ModalInteractionEvent event)
     {
         Series series = getSeriesFromMessageAndUptickMessageCount(event.getMessage());
         String twitchClipId = getAndResetTwitchClipIdForPublishing(series);
+        // Defer a reply to the event - this lets people know the bot is busy
+        event.deferReply().setEphemeral(true).queue();
 
         String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
-        event.editMessage(updatedSeriesTemplateString).queue();
-
         StringBuilder publishStringBuilder = createStringBuilderFromSeries(updatedSeriesTemplateString);
 
         extractAndFormatCommentary(event, series, publishStringBuilder);
-        publishCommentaryMessage(event, publishStringBuilder, twitchClipId);
+        editAndPublishFinalMessages(event, twitchClipId, updatedSeriesTemplateString, publishStringBuilder);
     }
 
     private static Series getSeriesFromMessageAndUptickMessageCount(final Message message)
@@ -266,5 +268,15 @@ public class ModalCommandHandler extends ListenerAdapter
         {
             publishChannel.sendMessage(publishStringBuilder.toString()).queue();
         }
+    }
+
+    private static void editAndPublishFinalMessages(@NotNull ModalInteractionEvent event, String twitchClipId, String updatedSeriesTemplateString, StringBuilder publishStringBuilder)
+    {
+        // Edits the template message in the command channel
+        event.getMessage().editMessage(updatedSeriesTemplateString).queue();
+        // Publishes message in commentary channel
+        publishCommentaryMessage(event, publishStringBuilder, twitchClipId);
+        // Deletes the deferred reply, as the bot is no longer busy
+        event.getHook().deleteOriginal().queue();
     }
 }
