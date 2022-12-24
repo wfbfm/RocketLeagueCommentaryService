@@ -111,6 +111,24 @@ public final class SeriesStringParser
         return overtimeString;
     }
 
+    public static String generateTwitchNameString(Series series)
+    {
+        String twitchNameString = "Twitch Name: " + series.getTwitchName();
+        return twitchNameString;
+    }
+
+    public static String generateTwitchBroadcasterIdString(Series series)
+    {
+        String twitchBroadcasterString = "Twitch Broadcaster ID: " + series.getTwitchBroadcasterId();
+        return twitchBroadcasterString;
+    }
+
+    public static String generateTwitchClipIdString(Series series)
+    {
+        String twitchClipId = "Twitch Clip ID for next message: " + series.getTwitchClipId();
+        return twitchClipId;
+    }
+
     public static String generateSeriesString(Series series)
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -126,6 +144,12 @@ public final class SeriesStringParser
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(generateOvertimeString(series));
         stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(generateTwitchNameString(series));
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(generateTwitchBroadcasterIdString(series));
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append(generateTwitchClipIdString(series));
+        stringBuilder.append(System.getProperty("line.separator"));
         return stringBuilder.toString();
     }
 
@@ -138,6 +162,9 @@ public final class SeriesStringParser
         String bluePlayers = lines[3];
         String orangePlayers = lines[4];
         String overtimeString = lines[5];
+        String twitchNameString = lines[6];
+        String twitchBroadcasterString = lines[7];
+        String twitchClipIdString = lines[8];
 
         // parse header
         String[] parsedHeaderString = headerString.split("-");
@@ -177,6 +204,15 @@ public final class SeriesStringParser
         // parse overtime
         boolean overtime = Boolean.parseBoolean(overtimeString.split("Overtime: ")[1]);
 
+        // parse twitchName
+        String twitchName = twitchNameString.split("Twitch Name: ")[1];
+
+        // parse twitchBroadcaster
+        String twitchBroadcaster = twitchBroadcasterString.split("Twitch Broadcaster ID: ")[1];
+
+        // parse twitchClipId
+        String twitchClipId = twitchClipIdString.split("Twitch Clip ID for next message: ")[1];
+
         Team blueTeam = new Team(blueTeamName,
                 new Player(bluePlayer1),
                 new Player(bluePlayer2),
@@ -196,7 +232,10 @@ public final class SeriesStringParser
                 blueTeam,
                 orangeTeam,
                 bestOf,
-                overtime
+                overtime,
+                twitchName,
+                twitchBroadcaster,
+                twitchClipId
         );
 
         return series;

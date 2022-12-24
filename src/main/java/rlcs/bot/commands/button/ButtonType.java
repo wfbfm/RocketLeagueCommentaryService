@@ -5,5 +5,6 @@ public enum ButtonType {
     goalorange,
     game,
     overtime,
-    comment
+    comment,
+    twitchclip
 }

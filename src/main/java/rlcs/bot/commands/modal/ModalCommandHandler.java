@@ -6,12 +6,21 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rlcs.bot.commands.twitch.TwitchClipper;
+import rlcs.bot.commands.twitch.TwitchStatus;
 import rlcs.series.Series;
 import rlcs.series.SeriesStringParser;
 import rlcs.series.TeamColour;
 
 public class ModalCommandHandler extends ListenerAdapter
 {
+    private static TwitchClipper twitchClipper;
+    private static final String COMMENTARY_CHANNEL = System.getenv("COMMENTARY_CHANNEL");
+    public ModalCommandHandler(final TwitchClipper twitchClipper)
+    {
+        this.twitchClipper = twitchClipper;
+    }
+
     @Override
     public void onModalInteraction(@NotNull ModalInteractionEvent event)
     {
@@ -45,13 +54,14 @@ public class ModalCommandHandler extends ListenerAdapter
     private static void handleGoalModalEvent(@NotNull ModalInteractionEvent event, TeamColour teamColour)
     {
         Series series = getSeriesFromMessageAndUptickMessageCount(event.getMessage());
+        String twitchClipId = getAndResetTwitchClipIdForPublishing(series);
 
         String scorer = event.getValue("scorer").getAsString();
         String assister = event.getValue("assister").getAsString();
         String gameTime = event.getValue("gametime").getAsString();
         String commentary = event.getValue("commentary").getAsString();
 
-        if (scorer == assister)
+        if (scorer.equals(assister))
         {
             event.reply("The same player cannot score and assist the same goal").setEphemeral(true).queue();
             return;
@@ -62,6 +72,7 @@ public class ModalCommandHandler extends ListenerAdapter
 
         // Original holder message will be updated with series template string
         String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
+        event.editMessage(updatedSeriesTemplateString).queue();
         // Publish string will be posted in the commentary channel with additional attributes
         StringBuilder publishStringBuilder = createStringBuilderFromSeries(updatedSeriesTemplateString);
 
@@ -91,14 +102,13 @@ public class ModalCommandHandler extends ListenerAdapter
 
             publishStringBuilder.append(commentary);
         }
-        publishCommentaryMessage(event, publishStringBuilder);
-
-        event.editMessage(updatedSeriesTemplateString).queue();
+        publishCommentaryMessage(event, publishStringBuilder, twitchClipId);
     }
 
     private static void handleGameModalEvent(@NotNull ModalInteractionEvent event)
     {
         Series series = getSeriesFromMessageAndUptickMessageCount(event.getMessage());
+        String twitchClipId = getAndResetTwitchClipIdForPublishing(series);
 
         int blueGameScore = series.getGameScore().getBlueScore();
         int orangeGameScore = series.getGameScore().getOrangeScore();
@@ -119,42 +129,41 @@ public class ModalCommandHandler extends ListenerAdapter
         series.getGameScore().setOrangeScore(0);
 
         String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
+        event.editMessage(updatedSeriesTemplateString).queue();
+
         StringBuilder publishStringBuilder = createStringBuilderFromSeries(updatedSeriesTemplateString);
 
         extractAndFormatCommentary(event, series, publishStringBuilder);
-
-        publishCommentaryMessage(event, publishStringBuilder);
-
-        event.editMessage(updatedSeriesTemplateString).queue();
+        publishCommentaryMessage(event, publishStringBuilder, twitchClipId);
     }
 
     private static void handleOvertimeModalEvent(@NotNull ModalInteractionEvent event)
     {
         Series series = getSeriesFromMessageAndUptickMessageCount(event.getMessage());
+        String twitchClipId = getAndResetTwitchClipIdForPublishing(series);
 
         series.setOvertime(true);
         String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
+        event.editMessage(updatedSeriesTemplateString).queue();
+
         StringBuilder publishStringBuilder = createStringBuilderFromSeries(updatedSeriesTemplateString);
 
         extractAndFormatCommentary(event, series, publishStringBuilder);
-
-        publishCommentaryMessage(event, publishStringBuilder);
-
-        event.editMessage(updatedSeriesTemplateString).queue();
+        publishCommentaryMessage(event, publishStringBuilder, twitchClipId);
     }
 
     private static void handleCommentModalEvent(@NotNull ModalInteractionEvent event)
     {
         Series series = getSeriesFromMessageAndUptickMessageCount(event.getMessage());
+        String twitchClipId = getAndResetTwitchClipIdForPublishing(series);
 
         String updatedSeriesTemplateString = SeriesStringParser.generateSeriesString(series);
+        event.editMessage(updatedSeriesTemplateString).queue();
+
         StringBuilder publishStringBuilder = createStringBuilderFromSeries(updatedSeriesTemplateString);
 
         extractAndFormatCommentary(event, series, publishStringBuilder);
-
-        publishCommentaryMessage(event, publishStringBuilder);
-
-        event.editMessage(updatedSeriesTemplateString).queue();
+        publishCommentaryMessage(event, publishStringBuilder, twitchClipId);
     }
 
     private static Series getSeriesFromMessageAndUptickMessageCount(final Message message)
@@ -163,6 +172,13 @@ public class ModalCommandHandler extends ListenerAdapter
         Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
         series.setMessageCount(series.getMessageCount() + 1);
         return series;
+    }
+
+    private static String getAndResetTwitchClipIdForPublishing(final Series series)
+    {
+        final String twitchClipId = series.getTwitchClipId();
+        series.setTwitchClipId("None");
+        return twitchClipId;
     }
 
     @NotNull
@@ -228,9 +244,24 @@ public class ModalCommandHandler extends ListenerAdapter
         }
     }
 
-    private static void publishCommentaryMessage(@NotNull ModalInteractionEvent event, StringBuilder publishStringBuilder)
+    private static void publishCommentaryMessage(@NotNull ModalInteractionEvent event, StringBuilder publishStringBuilder, String twitchClipId)
     {
-        TextChannel publishChannel = event.getJDA().getTextChannelById(System.getenv("COMMENTARY_CHANNEL"));
+        // Check if we need to publish a twitch clip
+        if (!twitchClipId.equals("None"))
+        {
+            String twitchClipUrl = twitchClipper.getUrlFromClipId(twitchClipId);
+            if (twitchClipUrl.equals(TwitchStatus.UNABLE_TO_FIND_CLIP.name()))
+            {
+                event.getHook().sendMessage("Sorry - I wasn't able to find the clip ID: " + twitchClipId).setEphemeral(true).queue();
+            }
+            else
+            {
+                publishStringBuilder.append(System.getProperty("line.separator"));
+                publishStringBuilder.append(twitchClipUrl);
+            }
+        }
+
+        TextChannel publishChannel = event.getJDA().getTextChannelById(COMMENTARY_CHANNEL);
         if (publishChannel != null)
         {
             publishChannel.sendMessage(publishStringBuilder.toString()).queue();

@@ -5,22 +5,30 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import rlcs.bot.commands.button.ButtonType;
+import rlcs.bot.commands.twitch.TwitchClipper;
+import rlcs.bot.commands.twitch.TwitchStatus;
 import rlcs.series.*;
 
 public class SlashCommandHandler extends ListenerAdapter {
 
+    private static TwitchClipper twitchClipper;
+    private static final String COMMAND_CHANNEL = System.getenv("COMMAND_CHANNEL");
+    public SlashCommandHandler(final TwitchClipper twitchClipper)
+    {
+        this.twitchClipper = twitchClipper;
+    }
+
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event)
     {
-        if (event.getChannel().getId() != System.getenv("COMMAND_CHANNEL"))
-        {
-            event.reply("Commentary commands can only be used in the #rlcs-mission-control channel " +
-                    "by users with the Commentator role").setEphemeral(true).queue();
-            return;
-        }
-
         if (event.getName().equals(String.valueOf(SlashType.createseries)))
         {
+            if (!event.getChannel().getId().equals(COMMAND_CHANNEL))
+            {
+                event.reply("Commentary commands can only be used in the #rlcs-mission-control channel " +
+                        "by users with the Commentator role").setEphemeral(true).queue();
+                return;
+            }
             handleCreateSeriesEvent(event);
         }
     }
@@ -44,6 +52,13 @@ public class SlashCommandHandler extends ListenerAdapter {
         String orangePlayer1Opt = event.getOption("orangeplayer1").getAsString();
         String orangePlayer2Opt = event.getOption("orangeplayer2").getAsString();
         String orangePlayer3Opt = event.getOption("orangeplayer3").getAsString();
+        String twitchName = "None";
+        String twitchBroadcasterId = TwitchStatus.TWITCH_USER_NOT_FOUND.name();
+        if (event.getOption("twitchchannel") != null)
+        {
+            twitchName = event.getOption("twitchchannel").getAsString();
+            twitchBroadcasterId = twitchClipper.getBroadcasterIdForTwitchName(twitchName);
+        }
 
         Team blueTeam = new Team(teamBlueOpt,
                 new Player(bluePlayer1Opt),
@@ -64,16 +79,35 @@ public class SlashCommandHandler extends ListenerAdapter {
                 blueTeam,
                 orangeTeam,
                 bestOfOpt,
-                false
+                false,
+                twitchName,
+                twitchBroadcasterId,
+                "None"
         );
 
-        event.getHook().sendMessage(SeriesStringParser.generateSeriesString(series))
-                .setActionRow(
-                        Button.primary(ButtonType.goalblue.name(), "⚽ " + blueTeam.getTeamName()),
-                        Button.danger(ButtonType.goalorange.name(), "⚽ " + orangeTeam.getTeamName()),
-                        Button.success(ButtonType.game.name(), "🏁 Game"),
-                        Button.secondary(ButtonType.overtime.name(), "🕒 Overtime"),
-                        Button.secondary(ButtonType.comment.name(), "💬 Comment"))
-                .queue();
+        if (!twitchBroadcasterId.equals(TwitchStatus.TWITCH_USER_NOT_FOUND.name()))
+        {
+            // Additional action row for twitch clips
+            event.getHook().sendMessage(SeriesStringParser.generateSeriesString(series))
+                    .addActionRow(
+                            Button.primary(ButtonType.goalblue.name(), "⚽ " + blueTeam.getTeamName()),
+                            Button.danger(ButtonType.goalorange.name(), "⚽ " + orangeTeam.getTeamName()),
+                            Button.success(ButtonType.game.name(), "🏁 Game"),
+                            Button.secondary(ButtonType.overtime.name(), "🕒 Overtime"),
+                            Button.secondary(ButtonType.comment.name(), "💬 Comment"))
+                    .addActionRow(Button.primary(ButtonType.twitchclip.name(), "🎬 Generate Twitch Clip for Next Message"))
+                    .queue();
+        }
+        else
+        {
+            event.getHook().sendMessage(SeriesStringParser.generateSeriesString(series))
+                    .setActionRow(
+                            Button.primary(ButtonType.goalblue.name(), "⚽ " + blueTeam.getTeamName()),
+                            Button.danger(ButtonType.goalorange.name(), "⚽ " + orangeTeam.getTeamName()),
+                            Button.success(ButtonType.game.name(), "🏁 Game"),
+                            Button.secondary(ButtonType.overtime.name(), "🕒 Overtime"),
+                            Button.secondary(ButtonType.comment.name(), "💬 Comment"))
+                    .queue();
+        }
     }
 }

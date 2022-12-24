@@ -9,11 +9,20 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 import rlcs.bot.commands.modal.ModalType;
+import rlcs.bot.commands.twitch.TwitchClipper;
+import rlcs.bot.commands.twitch.TwitchStatus;
 import rlcs.series.Series;
 import rlcs.series.SeriesStringParser;
 import rlcs.series.TeamColour;
 
 public class ButtonCommandHandler extends ListenerAdapter {
+
+    private static TwitchClipper twitchClipper;
+
+    public ButtonCommandHandler(final TwitchClipper twitchClipper)
+    {
+        this.twitchClipper = twitchClipper;
+    }
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event)
@@ -35,6 +44,9 @@ public class ButtonCommandHandler extends ListenerAdapter {
                     return;
                 case comment:
                     handleCommentEvent(event);
+                    return;
+                case twitchclip:
+                    handleTwitchClipEvent(event);
                     return;
             }
         } catch (IllegalArgumentException e) {
@@ -187,6 +199,29 @@ public class ButtonCommandHandler extends ListenerAdapter {
                 .build();
 
         event.replyModal(modal).queue();
+    }
+
+    private static void handleTwitchClipEvent(@NotNull ButtonInteractionEvent event)
+    {
+        Series series = getSeriesFromMessage(event.getMessage());
+
+        if (series.getTwitchBroadcasterId().equals(TwitchStatus.TWITCH_USER_NOT_FOUND.name()))
+        {
+            event.reply("Sorry - the twitch user of this series " + series.getTwitchName() + " wasn't recognised, so I can't create a clip!").setEphemeral(true).queue();
+            return;
+        }
+
+        String twitchClipId = twitchClipper.createClipAndReturnClipId(series.getTwitchBroadcasterId());
+
+        if (twitchClipId.equals(TwitchStatus.UNABLE_TO_CREATE_CLIP.name()))
+        {
+            event.reply("Sorry - I was unable to create a Twitch clip for " + series.getTwitchName() + "!").setEphemeral(true).queue();
+            return;
+        }
+
+        // uptick the series twitch clip ID, and edit the message
+        series.setTwitchClipId(twitchClipId);
+        event.editMessage(SeriesStringParser.generateSeriesString(series)).queue();
     }
 
     private static Series getSeriesFromMessage(final Message message)
