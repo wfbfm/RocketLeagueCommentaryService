@@ -95,7 +95,10 @@ public class SlashCommandHandler extends ListenerAdapter {
                             Button.success(ButtonType.game.name(), "🏁 Game"),
                             Button.secondary(ButtonType.overtime.name(), "🕒 Overtime"),
                             Button.secondary(ButtonType.comment.name(), "💬 Comment"))
-                    .addActionRow(Button.primary(ButtonType.twitchclip.name(), "🎬 Generate Twitch Clip for Next Message"))
+                    .addActionRow(
+                            Button.primary(ButtonType.twitchclip.name(), "🎬 Generate Twitch Clip for Next Message"),
+                            Button.danger(ButtonType.removetwitchclip.name(), "❌ Remove Clip")
+                    )
                     .queue();
         }
         else

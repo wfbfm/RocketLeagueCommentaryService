@@ -6,5 +6,6 @@ public enum ButtonType {
     game,
     overtime,
     comment,
-    twitchclip
+    twitchclip,
+    removetwitchclip
 }
