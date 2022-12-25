@@ -295,6 +295,14 @@ public class ModalCommandHandler extends ListenerAdapter
             commentary = commentary.replace("[o2]", "**" + orangePlayer2 + "**");
             commentary = commentary.replace("[o3]", "**" + orangePlayer3 + "**");
 
+            commentary = commentary.replace("[B1]", "**" + bluePlayer1+ "**");
+            commentary = commentary.replace("[B2]", "**" + bluePlayer2 + "**");
+            commentary = commentary.replace("[B3]", "**" + bluePlayer3 + "**");
+
+            commentary = commentary.replace("[O1]", "**" + orangePlayer1+ "**");
+            commentary = commentary.replace("[O2]", "**" + orangePlayer2 + "**");
+            commentary = commentary.replace("[O3]", "**" + orangePlayer3 + "**");
+
             publishStringBuilder.append(commentary);
         }
     }
