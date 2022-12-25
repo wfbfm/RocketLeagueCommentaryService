@@ -37,8 +37,12 @@ public class SlashCommandHandler extends ListenerAdapter {
     {
         event.deferReply().queue();
 
-        String teamBlueOpt = event.getOption("teamblue").getAsString();
-        String teamOrangeOpt = event.getOption("teamorange").getAsString();
+        String teamBlueOpt = event.getOption("teamblue").getAsString()
+                .replace(":", "")
+                .replace("-", "");
+        String teamOrangeOpt = event.getOption("teamorange").getAsString()
+                .replace(":", "")
+                .replace("-", "");
         int bestOfOpt = event.getOption("bestof").getAsInt();
         int seriesIdOpt = event.getOption("seriesid").getAsInt();
         int messageCountOpt = event.getOption("messagecount").getAsInt();
@@ -46,12 +50,12 @@ public class SlashCommandHandler extends ListenerAdapter {
         int orangeSeriesScoreOpt = event.getOption("orangeseriesscore").getAsInt();
         int blueGameScoreOpt = event.getOption("bluegamescore").getAsInt();
         int orangeGameScoreOpt = event.getOption("orangegamescore").getAsInt();
-        String bluePlayer1Opt = event.getOption("blueplayer1").getAsString();
-        String bluePlayer2Opt = event.getOption("blueplayer2").getAsString();
-        String bluePlayer3Opt = event.getOption("blueplayer3").getAsString();
-        String orangePlayer1Opt = event.getOption("orangeplayer1").getAsString();
-        String orangePlayer2Opt = event.getOption("orangeplayer2").getAsString();
-        String orangePlayer3Opt = event.getOption("orangeplayer3").getAsString();
+        String bluePlayer1Opt = event.getOption("blueplayer1").getAsString().replace(";", "");
+        String bluePlayer2Opt = event.getOption("blueplayer2").getAsString().replace(";", "");
+        String bluePlayer3Opt = event.getOption("blueplayer3").getAsString().replace(";", "");
+        String orangePlayer1Opt = event.getOption("orangeplayer1").getAsString().replace(";", "");
+        String orangePlayer2Opt = event.getOption("orangeplayer2").getAsString().replace(";", "");
+        String orangePlayer3Opt = event.getOption("orangeplayer3").getAsString().replace(";", "");
         String twitchName = "None";
         String twitchBroadcasterId = TwitchStatus.TWITCH_USER_NOT_FOUND.name();
         if (event.getOption("twitchchannel") != null)
@@ -82,6 +86,7 @@ public class SlashCommandHandler extends ListenerAdapter {
                 false,
                 twitchName,
                 twitchBroadcasterId,
+                "None",
                 "None"
         );
 
@@ -97,19 +102,23 @@ public class SlashCommandHandler extends ListenerAdapter {
                             Button.secondary(ButtonType.comment.name(), "💬 Comment"))
                     .addActionRow(
                             Button.primary(ButtonType.twitchclip.name(), "🎬 Generate Twitch Clip for Next Message"),
-                            Button.danger(ButtonType.removetwitchclip.name(), "❌ Remove Clip")
+                            Button.danger(ButtonType.removetwitchclip.name(), "❌ Remove Clip"),
+                            Button.secondary(ButtonType.editscore.name(), "📝 Edit Score")
                     )
                     .queue();
         }
         else
         {
             event.getHook().sendMessage(SeriesStringParser.generateSeriesString(series))
-                    .setActionRow(
+                    .addActionRow(
                             Button.primary(ButtonType.goalblue.name(), "⚽ " + blueTeam.getTeamName()),
                             Button.danger(ButtonType.goalorange.name(), "⚽ " + orangeTeam.getTeamName()),
                             Button.success(ButtonType.game.name(), "🏁 Game"),
                             Button.secondary(ButtonType.overtime.name(), "🕒 Overtime"),
                             Button.secondary(ButtonType.comment.name(), "💬 Comment"))
+                    .addActionRow(
+                            Button.secondary(ButtonType.editscore.name(), "📝 Edit Score")
+                    )
                     .queue();
         }
     }

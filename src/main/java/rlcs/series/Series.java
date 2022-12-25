@@ -17,7 +17,9 @@ public class Series
 
     private String twitchClipId;
 
-    public Series(int seriesId, int messageCount, Score gameScore, Score seriesScore, Team blueTeam, Team orangeTeam, int bestOf, boolean overtime, String twitchName, String twitchBroadcasterId, String twitchClipId)
+    private String commentator;
+
+    public Series(int seriesId, int messageCount, Score gameScore, Score seriesScore, Team blueTeam, Team orangeTeam, int bestOf, boolean overtime, String twitchName, String twitchBroadcasterId, String twitchClipId, String commentator)
     {
         this.seriesId = seriesId;
         this.messageCount = messageCount;
@@ -30,6 +32,7 @@ public class Series
         this.twitchName = twitchName;
         this.twitchBroadcasterId = twitchBroadcasterId;
         this.twitchClipId = twitchClipId;
+        this.commentator = commentator;
     }
 
 
@@ -153,5 +156,15 @@ public class Series
     public void setTwitchClipId(final String twitchClipId)
     {
         this.twitchClipId = twitchClipId;
+    }
+
+    public String getCommentator()
+    {
+        return commentator;
+    }
+
+    public void setCommentator(final String commentator)
+    {
+        this.commentator = commentator;
     }
 }

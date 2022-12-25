@@ -56,6 +56,7 @@ public class RLCSDiscordBot {
             rlcsGuild.upsertCommand(ModalType.gamemodal.name(), "End Game").queue();
             rlcsGuild.upsertCommand(ModalType.overtimemodal.name(), "Enter Overtime").queue();
             rlcsGuild.upsertCommand(ModalType.commentmodal.name(), "Enter Comment").queue();
+            rlcsGuild.upsertCommand(ModalType.editscoremodal.name(), "Edit Score").queue();
         }
     }
 
