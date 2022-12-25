@@ -150,14 +150,14 @@ public final class SeriesStringParser
         stringBuilder.append(generatePlayerString(series, TeamColour.ORANGE));
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(generateOvertimeString(series));
+        stringBuilder.append("; ");
+        stringBuilder.append(generateCommentatorString(series));
         stringBuilder.append(System.getProperty("line.separator"));
         stringBuilder.append(generateTwitchNameString(series));
-        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("; ");
         stringBuilder.append(generateTwitchBroadcasterIdString(series));
-        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("; ");
         stringBuilder.append(generateTwitchClipIdString(series));
-        stringBuilder.append(System.getProperty("line.separator"));
-        stringBuilder.append(generateCommentatorString(series));
         stringBuilder.append(System.getProperty("line.separator"));
         return stringBuilder.toString();
     }
@@ -170,11 +170,14 @@ public final class SeriesStringParser
         String seriesScoreString = lines[2];
         String bluePlayers = lines[3];
         String orangePlayers = lines[4];
-        String overtimeString = lines[5];
-        String twitchNameString = lines[6];
-        String twitchBroadcasterString = lines[7];
-        String twitchClipIdString = lines[8];
-        String commentatorString = lines[9];
+        String overtimeAndCommentatorString = lines[5];
+        String twitchString = lines[6];
+
+        String overtimeString = overtimeAndCommentatorString.split("; ")[0];
+        String commentatorString = overtimeAndCommentatorString.split("; ")[1];
+        String twitchNameString = twitchString.split("; ")[0];
+        String twitchBroadcasterString = twitchString.split("; ")[1];
+        String twitchClipIdString = twitchString.split("; ")[2];
 
         // parse header
         String[] parsedHeaderString = headerString.split("-");
