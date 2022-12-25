@@ -1,5 +1,7 @@
 package rlcs.series;
 
+import org.apache.commons.lang3.EnumUtils;
+
 public final class SeriesStringParser
 {
     private static final int ACCEPTABLE_CHAR_LENGTH = 40;
@@ -31,11 +33,10 @@ public final class SeriesStringParser
         {
             stringBuilder.append(" ");
         }
-        stringBuilder.append(" :");
-        stringBuilder.append(EmojiNumber.values()[series.getGameScore().getBlueScore()].toString().toLowerCase());
-        stringBuilder.append(": - :");
-        stringBuilder.append(EmojiNumber.values()[series.getGameScore().getOrangeScore()].toString().toLowerCase());
-        stringBuilder.append(": ");
+        stringBuilder.append(convertTeamGameScoreToEmojiString(series, TeamColour.BLUE));
+        stringBuilder.append(" - ");
+        stringBuilder.append(convertTeamGameScoreToEmojiString(series, TeamColour.ORANGE));
+
         for (int i = 0; i < spacesToAppend; i++)
         {
             stringBuilder.append(" ");
@@ -182,14 +183,36 @@ public final class SeriesStringParser
         int seriesId = Integer.parseInt(seriesIdString.substring(1, seriesIdString.length()));
         int messageCount = Integer.parseInt(messageCountString.substring(1, messageCountString.length()));
 
-        // parse gameScore
-        gameScoreString = gameScoreString.replace("-", "");
-        String[] parsedGameScoreString = gameScoreString.split(":");
-        String blueTeamName = parsedGameScoreString[0].trim();
-        String orangeTeamName = parsedGameScoreString[parsedGameScoreString.length - 1].trim();
+        // parse gameScore e.g.
+        // Team Liquid :one::one: - :three: FaZe
+        String blueGameScoreString = gameScoreString.split("-")[0];
+        String[] splitBlueGameScoreString = blueGameScoreString.split(":");
+        String blueTeamName = splitBlueGameScoreString[0].trim();
+        StringBuilder blueScoreStringBuilder = new StringBuilder();
+        // convert each digit from Emoji to int format, :one: -> 1
+        for (int i = 1; i < splitBlueGameScoreString.length; i++)
+        {
+            if (EnumUtils.isValidEnumIgnoreCase(EmojiNumber.class, splitBlueGameScoreString[i]))
+            {
+                blueScoreStringBuilder.append( EmojiNumber.valueOf(splitBlueGameScoreString[i].toUpperCase().trim()).ordinal());
+            }
+        }
+        int blueGameScore = Integer.parseInt(blueScoreStringBuilder.toString());
 
-        int blueGameScore = EmojiNumber.valueOf(parsedGameScoreString[1].toUpperCase().trim()).ordinal();
-        int orangeGameScore = EmojiNumber.valueOf(parsedGameScoreString[3].toUpperCase().trim()).ordinal();
+        String orangeGameScoreString = gameScoreString.split("-")[1];
+        String[] splitOrangeGameScoreString = orangeGameScoreString.split(":");
+        String orangeTeamName = splitOrangeGameScoreString[splitOrangeGameScoreString.length - 1].trim();
+        StringBuilder orangeScoreStringBuilder = new StringBuilder();
+        // convert each digit from Emoji to int format, :one: -> 1
+        for (int i = 0; i < splitOrangeGameScoreString.length - 1; i++)
+        {
+            if (EnumUtils.isValidEnumIgnoreCase(EmojiNumber.class, splitOrangeGameScoreString[i]))
+            {
+                orangeScoreStringBuilder.append( EmojiNumber.valueOf(splitOrangeGameScoreString[i].toUpperCase().trim()).ordinal());
+            }
+        }
+        int orangeGameScore = Integer.parseInt(orangeScoreStringBuilder.toString());
+        
 
         // parse seriesScore
         int blueSeriesScore = seriesScoreString.split("blue_circle").length - 1;
@@ -252,6 +275,20 @@ public final class SeriesStringParser
         );
 
         return series;
+    }
+
+    public static String convertTeamGameScoreToEmojiString(Series series, TeamColour teamColour)
+    {
+        StringBuilder score = new StringBuilder();
+        char[] scoreDigits = String.valueOf(series.getGameScore().getTeamScore(teamColour)).toCharArray();
+        for (char digit : scoreDigits)
+        {
+            score.append(":");
+            int digitInt = Character.getNumericValue(digit);
+            score.append(EmojiNumber.values()[digitInt].toString().toLowerCase());
+            score.append(":");
+        }
+        return score.toString();
     }
 
 }

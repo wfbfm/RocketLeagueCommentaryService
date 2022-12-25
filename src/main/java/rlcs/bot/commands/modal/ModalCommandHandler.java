@@ -331,7 +331,7 @@ public class ModalCommandHandler extends ListenerAdapter
         StringBuilder publishStringWithCommentator = new StringBuilder();
         if (hasCommentatorChanged)
         {
-            publishStringWithCommentator.append("```Commentary taken over by " + commentator + "```");
+            publishStringWithCommentator.append("```Commentary for series taken over by " + commentator + "```");
         }
         publishStringWithCommentator.append(publishStringBuilder);
         publishCommentaryMessage(event, publishStringWithCommentator, twitchClipId);

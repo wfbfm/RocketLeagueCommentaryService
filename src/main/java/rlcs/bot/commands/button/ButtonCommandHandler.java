@@ -64,13 +64,6 @@ public class ButtonCommandHandler extends ListenerAdapter {
     {
         Series series = getSeriesFromMessage(event.getMessage());
 
-        // TODO: Support double-digit scores, this is lazy
-        if (series.getGameScore().getTeamScore(teamColour) >= 9)
-        {
-            event.reply("Sorry - only single digit goals.  Please raise a Jira™️").setEphemeral(true).queue();
-            return;
-        }
-
         String playerNames = createPlaceholderPlayerNameLabelForOneTeam(teamColour, series);
 
         TextInput scorer = TextInput.create("scorer", "⚽ Scorer - Enter Player ID per below", TextInputStyle.SHORT)
@@ -279,14 +272,14 @@ public class ButtonCommandHandler extends ListenerAdapter {
 
         TextInput blueGameScore = TextInput.create("bluegamescore", series.getBlueTeam().getTeamName() + " GAME Score", TextInputStyle.SHORT)
                 .setMinLength(1)
-                .setMaxLength(1)
+                .setMaxLength(2)
                 .setValue(String.valueOf(series.getGameScore().getBlueScore()))
                 .setRequired(true)
                 .build();
 
         TextInput orangeGameScore = TextInput.create("orangegamescore", series.getOrangeTeam().getTeamName() + " GAME Score", TextInputStyle.SHORT)
                 .setMinLength(1)
-                .setMaxLength(1)
+                .setMaxLength(2)
                 .setValue(String.valueOf(series.getGameScore().getOrangeScore()))
                 .setRequired(true)
                 .build();
