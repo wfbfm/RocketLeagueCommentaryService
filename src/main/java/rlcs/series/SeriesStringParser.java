@@ -283,10 +283,13 @@ public final class SeriesStringParser
         char[] scoreDigits = String.valueOf(series.getGameScore().getTeamScore(teamColour)).toCharArray();
         for (char digit : scoreDigits)
         {
-            score.append(":");
             int digitInt = Character.getNumericValue(digit);
-            score.append(EmojiNumber.values()[digitInt].toString().toLowerCase());
-            score.append(":");
+            if (digitInt >= 0 && digitInt <= 9)
+            {
+                score.append(":");
+                score.append(EmojiNumber.values()[digitInt].toString().toLowerCase());
+                score.append(":");
+            }
         }
         return score.toString();
     }
