@@ -307,8 +307,9 @@ public class ModalCommandHandler extends ListenerAdapter
         }
     }
 
-    private static void publishCommentaryMessage(@NotNull ModalInteractionEvent event, StringBuilder publishStringBuilder, String twitchClipId)
+    private static boolean publishCommentaryMessage(@NotNull ModalInteractionEvent event, StringBuilder publishStringBuilder, String twitchClipId)
     {
+        boolean failedDuringPublishing = false;
         // Check if we need to publish a twitch clip
         if (!twitchClipId.equals("None"))
         {
@@ -316,6 +317,7 @@ public class ModalCommandHandler extends ListenerAdapter
             if (twitchClipUrl.equals(TwitchStatus.UNABLE_TO_FIND_CLIP.name()))
             {
                 event.getHook().sendMessage("Sorry - I wasn't able to find the clip ID: " + twitchClipId).setEphemeral(true).queue();
+                failedDuringPublishing = true;
             }
             else
             {
@@ -329,6 +331,7 @@ public class ModalCommandHandler extends ListenerAdapter
         {
             publishChannel.sendMessage(publishStringBuilder.toString()).queue();
         }
+        return failedDuringPublishing;
     }
 
     private static void editAndPublishFinalMessages(@NotNull ModalInteractionEvent event, String twitchClipId, String updatedSeriesTemplateString, StringBuilder publishStringBuilder, boolean hasCommentatorChanged, String commentator)
@@ -342,9 +345,12 @@ public class ModalCommandHandler extends ListenerAdapter
             publishStringWithCommentator.append("```Commentary for series taken over by " + commentator + "```");
         }
         publishStringWithCommentator.append(publishStringBuilder);
-        publishCommentaryMessage(event, publishStringWithCommentator, twitchClipId);
-        // Deletes the deferred reply, as the bot is no longer busy
-        event.getHook().deleteOriginal().queue();
+        boolean failedDuringPublishing = publishCommentaryMessage(event, publishStringWithCommentator, twitchClipId);
+        // Deletes the deferred reply, as the bot is no longer busy - only if error message hasn't been returned
+        if (!failedDuringPublishing)
+        {
+            event.getHook().deleteOriginal().queue();
+        }
     }
 
     private static boolean hasCommentatorChanged(@NotNull ModalInteractionEvent event, Series series)
