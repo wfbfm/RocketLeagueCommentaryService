@@ -20,12 +20,12 @@
 
 title: Rocket League Commentary Service
 description: >- # this means to ignore newlines until "baseurl:"
-  Live goal updates, Twitch clips and ongoing commentary for games of Rocket League!
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: WFBFM
+  Join us for live Rocket League text commentary!
+domain: wfbfm.github.io
+baseurl: /RocketLeagueCommentaryService # the subpath of your site, e.g. /blog
+url: https://wfbfm.github.io # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  wfbfm
-logo: "rlcs-logo.png"
+# logo: "rlcs-logo.png"
 
 # Build settings
 theme: minima
