@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import rlcs.bot.commands.button.ButtonCommandHandler;
+import rlcs.bot.commands.liquipedia.LiquipediaTeamGetter;
 import rlcs.bot.commands.modal.ModalCommandHandler;
 import rlcs.bot.commands.modal.ModalType;
 import rlcs.bot.commands.slash.SlashCommandHandler;
@@ -19,10 +20,11 @@ public class RLCSDiscordBot {
     public static void main(String[] args) throws InterruptedException
     {
         TwitchClipper twitchClipper = new TwitchClipper();
+        LiquipediaTeamGetter liquipediaTeamGetter = new LiquipediaTeamGetter();
 
         JDA jda = JDABuilder.createDefault(BOT_TOKEN)
                 .setActivity(Activity.watching("RLCS"))
-                .addEventListeners(new SlashCommandHandler(twitchClipper),
+                .addEventListeners(new SlashCommandHandler(twitchClipper, liquipediaTeamGetter),
                         new ButtonCommandHandler(twitchClipper),
                         new ModalCommandHandler(twitchClipper))
                 .build()
@@ -32,6 +34,7 @@ public class RLCSDiscordBot {
         if (rlcsGuild != null)
         {
             upsertCreateSeriesManuallySlashCommand(rlcsGuild);
+            upsertUpdateTeamsFromLiquipediaSlashCommand(rlcsGuild);
 
             rlcsGuild.upsertCommand(ModalType.goalbluemodal.name(), "Goal for Blue team").queue();
             rlcsGuild.upsertCommand(ModalType.goalorangemodal.name(), "Goal for Orange team").queue();
@@ -46,9 +49,7 @@ public class RLCSDiscordBot {
     {
         rlcsGuild.upsertCommand(SlashType.createseriesmanually.name(), "Create RLCS Series between teams")
                 .addOptions(
-                        new OptionData(OptionType.STRING, "teamblue", "Blue team name", true)
-                                .addChoice("Blue Team 1", "team1")
-                                .addChoice("Blue Team 2", "team2"),
+                        new OptionData(OptionType.STRING, "teamblue", "Blue team name", true),
                         new OptionData(OptionType.STRING, "teamorange", "Orange team name", true),
                         new OptionData(OptionType.INTEGER, "bestof", "Number of games", true).setMinValue(1),
                         new OptionData(OptionType.STRING, "blueplayer1", "Blue player 1", true),
@@ -61,4 +62,11 @@ public class RLCSDiscordBot {
                 ).queue();
     }
 
+    private static void upsertUpdateTeamsFromLiquipediaSlashCommand(Guild rlcsGuild)
+    {
+        rlcsGuild.upsertCommand(SlashType.updateteamsfromliquipedia.name(), "Update list of teams/players from Liquipedia event link")
+                .addOptions(
+                        new OptionData(OptionType.STRING, "liquipediaurl", "Liquipedia Event URL", true).setDescription("eg https://liquipedia.net/rocketleague/Rocket_League_Championship_Series/2022-23/Fall#Participants")
+                ).queue();
+    }
 }
