@@ -73,12 +73,12 @@ public class SlashCommandHandler extends ListenerAdapter {
 
         if (StringUtils.isEmpty(url))
         {
-            event.getHook().sendMessage("Unable to update team data from empty url.  Try restoring from old url: " + oldUrl).queue();
+            event.getHook().sendMessage("Unable to update team data from empty url - try a valid https://liquipedia.net/rocketleague/ domain link").queue();
             return;
         }
         if (!url.startsWith("https://liquipedia.net/rocketleague/"))
         {
-            event.getHook().sendMessage("Unable to update team data from url: " + url + " - try a valid https://liquipedia.net/rocketleague/ domain link or restore from old url: " + oldUrl).queue();
+            event.getHook().sendMessage("Unable to update team data from url: " + url + " - try a valid https://liquipedia.net/rocketleague/ domain link").queue();
             return;
         }
         this.liquipediaTeamGetter.setLiquipediaUrl(url);
@@ -92,7 +92,7 @@ public class SlashCommandHandler extends ListenerAdapter {
         {
             // Upsert a new slash command with the updated dropdowns
             upsertCreateSeriesSlashCommand(event.getGuild());
-            event.getHook().sendMessage("Successfully updated team/player ref data from Liquipedia url: " + url).queue();
+            event.getHook().sendMessage("Bot successfully updated list of teams/players from Liquipedia url: " + url).queue();
             return;
         }
     }
@@ -104,6 +104,13 @@ public class SlashCommandHandler extends ListenerAdapter {
         int seriesId = getNewSeriesIdFromMessageHistory(event);
 
         Map<String, Map<String, String>> teamToPlayerMap = this.liquipediaTeamGetter.getTeamToPlayerMap();
+
+        if (teamToPlayerMap.size() == 0)
+        {
+            event.getHook().sendMessage("Liquipedia data hasn't been fetched yet!  " +
+                    "Try /createseriesmanually, or /updateteamsfromliquipedia to update the reference data.").queue();
+            return;
+        }
 
         String teamBlueOpt;
         String bluePlayer1Opt;
@@ -270,7 +277,7 @@ public class SlashCommandHandler extends ListenerAdapter {
                             Button.secondary(ButtonType.comment.name(), "💬 Comment"))
                     .addActionRow(
                             Button.primary(ButtonType.twitchclip.name(), "🎬 Generate Twitch Clip for Next Message"),
-                            Button.danger(ButtonType.removetwitchclip.name(), "❌ Remove Clip"),
+                            Button.danger(ButtonType.removetwitchclip.name(), "🚫 Remove Clip"),
                             Button.secondary(ButtonType.editscore.name(), "📝 Edit Score")
                     )
                     .queue();
@@ -304,7 +311,7 @@ public class SlashCommandHandler extends ListenerAdapter {
 
     private void upsertCreateSeriesSlashCommand(Guild rlcsGuild)
     {
-        rlcsGuild.upsertCommand(SlashType.createseries.name(), "Create RLCS Series between teams.  Use /updateTeamsFromLiquipedia to update team list")
+        rlcsGuild.upsertCommand(SlashType.createseries.name(), "Create RLCS Series between teams.  Use /updateTeamsFromLiquipedia to update list of teams!")
                 .addOptions(
                         new OptionData(OptionType.STRING, "teamblue", "Blue team name", true)
                                 .addChoices(this.liquipediaTeamGetter.getListChoices()),

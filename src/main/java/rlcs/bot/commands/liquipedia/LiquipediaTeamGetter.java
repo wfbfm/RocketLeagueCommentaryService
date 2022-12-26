@@ -101,15 +101,21 @@ public class LiquipediaTeamGetter
             }
 
             // parse teamNameHolder for teamName
-            String teamName;
+            String teamName = null;
+            if (teamNameHolders.get(i).select("a").size() == 0)
+            {
+                // case where team is TBD
+                teamName = teamNameHolders.get(i).text();
+            }
+            if (teamNameHolders.get(i).select("a").size() == 1)
+            {
+                // usual case where teamName is nested
+                teamName = teamNameHolders.get(i).select("a").get(0).text();
+            }
             if (teamNameHolders.get(i).select("a").size() > 1)
             {
                 // skip over the Flag that is added for international event pages
                 teamName = teamNameHolders.get(i).select("a").get(1).text();
-            }
-            else
-            {
-                teamName = teamNameHolders.get(i).select("a").get(0).text();
             }
 
             // Add to map

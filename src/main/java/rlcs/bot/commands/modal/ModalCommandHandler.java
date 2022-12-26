@@ -204,7 +204,7 @@ public class ModalCommandHandler extends ListenerAdapter
         }
         if (series.getBestOf() % 2 == 0)
         {
-            event.getHook().sendMessage("Series can only be Best Of an ODD number - i.e. not " + series.getBestOf()).setEphemeral(true).queue();
+            event.getHook().sendMessage("Best Of can only be an ODD number - i.e. not " + series.getBestOf()).setEphemeral(true).queue();
             return;
         }
         int maxScore = (series.getBestOf() + 1) / 2;
@@ -316,7 +316,8 @@ public class ModalCommandHandler extends ListenerAdapter
             String twitchClipUrl = twitchClipper.getUrlFromClipId(twitchClipId);
             if (twitchClipUrl.equals(TwitchStatus.UNABLE_TO_FIND_CLIP.name()))
             {
-                event.getHook().sendMessage("Sorry - I wasn't able to find the clip ID: " + twitchClipId).setEphemeral(true).queue();
+                event.getHook().sendMessage("Oops - I wasn't able to find the clip ID: " + twitchClipId +
+                        "  The streamer may not allow me to create clips, or the clipping service is unavailable.").setEphemeral(true).queue();
                 failedDuringPublishing = true;
             }
             else
