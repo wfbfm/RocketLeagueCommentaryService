@@ -86,7 +86,7 @@ public class ButtonCommandHandler extends ListenerAdapter {
                 .build();
 
         TextInput commentary = TextInput.create("commentary", "💬 Comment (eg \"[1]\" is replaced by player)", TextInputStyle.PARAGRAPH)
-                .setMinLength(5)
+                .setMinLength(25)
                 .setMaxLength(500)
                 .setRequired(false)
                 .build();
@@ -117,12 +117,12 @@ public class ButtonCommandHandler extends ListenerAdapter {
 
         if (blueGameScore == orangeGameScore)
         {
-            event.reply("Scores are level - cannot end game").setEphemeral(true).queue();
+            event.reply("Cannot end game: scores are level!").setEphemeral(true).queue();
             return;
         }
         if (series.getSeriesScore().getBlueScore() >= maxScore || series.getSeriesScore().getOrangeScore() >= maxScore)
         {
-            event.reply("Series already won - cannot end game").setEphemeral(true).queue();
+            event.reply("Cannot end game: series has already been won!  Try changing the BestOf amount via Edit Score.").setEphemeral(true).queue();
             return;
         }
         String gameWinner = null;
@@ -138,7 +138,7 @@ public class ButtonCommandHandler extends ListenerAdapter {
         String playerNames = createPlaceholderPlayerNameLabel(series);
 
         TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\" blue p1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
-                .setMinLength(5)
+                .setMinLength(25)
                 .setMaxLength(500)
                 .setPlaceholder(playerNames)
                 .setRequired(false)
@@ -157,20 +157,28 @@ public class ButtonCommandHandler extends ListenerAdapter {
         String originalMessage = event.getMessage().getContentRaw();
         Series series = SeriesStringParser.parseSeriesFromString(originalMessage);
 
+        if (series.isOvertime())
+        {
+            event.reply("This game is already in Overtime!").setEphemeral(true).queue();
+            return;
+        }
+
         int blueGameScore = series.getGameScore().getBlueScore();
         int orangeGameScore = series.getGameScore().getOrangeScore();
 
         if (blueGameScore != orangeGameScore)
         {
-            event.reply("Scores are not level - overtime not possible").setEphemeral(true).queue();
+            event.reply("Overtime not possible: scores are not level").setEphemeral(true).queue();
             return;
         }
+
+        int gameNumber = series.getSeriesScore().getBlueScore() + series.getSeriesScore().getOrangeScore() + 1;
 
         TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\" blue p1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
                 .setMinLength(5)
                 .setMaxLength(500)
-                .setValue("🚨 🕒 OVERTIME 🕒 🚨")
-                .setRequired(false)
+                .setValue("🚨 🕒 GAME " + gameNumber + " - OVERTIME 🕒 🚨")
+                .setRequired(true)
                 .build();
 
         Modal modal = Modal.create(ModalType.overtimemodal.name(), "Overtime!")
@@ -187,7 +195,7 @@ public class ButtonCommandHandler extends ListenerAdapter {
         String playerNames = createPlaceholderPlayerNameLabel(series);
 
         TextInput commentary = TextInput.create("commentary", "💬 Comment (\"[b1]\" blue p1, \"[o1]\" orange etc)", TextInputStyle.PARAGRAPH)
-                .setMinLength(5)
+                .setMinLength(25)
                 .setMaxLength(500)
                 .setPlaceholder(playerNames)
                 .setRequired(true)
@@ -208,7 +216,7 @@ public class ButtonCommandHandler extends ListenerAdapter {
 
         if (series.getTwitchBroadcasterId().equals(TwitchStatus.TWITCH_USER_NOT_FOUND.name()))
         {
-            event.getHook().sendMessage("Sorry - the twitch user of this series " + series.getTwitchName() + " wasn't recognised, so I can't create a clip!").setEphemeral(true).queue();
+            event.getHook().sendMessage("Oops - the twitch user of this series " + series.getTwitchName() + " wasn't recognised, so I can't create a clip!").setEphemeral(true).queue();
             return;
         }
 
@@ -217,14 +225,14 @@ public class ButtonCommandHandler extends ListenerAdapter {
             twitchClipId = twitchClipper.createClipAndReturnClipId(series.getTwitchBroadcasterId());
         } catch (RuntimeException e)
         {
-            event.getHook().sendMessage("Sorry - I was unable to create a Twitch clip for " + series.getTwitchName() + "!  " +
+            event.getHook().sendMessage("Oops - I was unable to create a Twitch clip for " + series.getTwitchName() + "!  " +
                     "The channel " + series.getTwitchName() + " may not support clips - or clipping may be allowed only for followers/subscribers").setEphemeral(true).queue();
             return;
         }
 
         if (twitchClipId.equals(TwitchStatus.UNABLE_TO_CREATE_CLIP.name()))
         {
-            event.getHook().sendMessage("Sorry - I was unable to create a Twitch clip for " + series.getTwitchName() + "!  " +
+            event.getHook().sendMessage("Oops - I was unable to create a Twitch clip for " + series.getTwitchName() + "!  " +
                     "The channel " + series.getTwitchName() + " may not support clips - or clipping may be allowed only for followers/subscribers").setEphemeral(true).queue();
             return;
         }

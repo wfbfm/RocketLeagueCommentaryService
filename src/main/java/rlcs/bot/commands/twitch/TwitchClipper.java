@@ -27,7 +27,7 @@ public class TwitchClipper
 
     public String parseTwitchName(final String twitchName)
     {
-        if (!StringUtils.isNotEmpty(twitchName))
+        if (StringUtils.isEmpty(twitchName))
         {
             return "None";
         }
@@ -45,7 +45,7 @@ public class TwitchClipper
 
     public String getBroadcasterIdForTwitchName(final String twitchName)
     {
-        if (!StringUtils.isNotEmpty(twitchName))
+        if (StringUtils.isEmpty(twitchName))
         {
             return TwitchStatus.TWITCH_USER_NOT_FOUND.name();
         }
