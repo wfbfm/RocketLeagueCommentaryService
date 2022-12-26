@@ -1,3 +1,10 @@
+---
+# Feel free to add content and custom Front Matter to this file.
+# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+
+layout: home
+---
+
 # RocketLeagueCommentaryService
 
 This Discord bot powers the Rocket League Commentary Service: https://discord.gg/Y8sBAmrzrq
@@ -25,5 +32,4 @@ The bot enables anyone with the **Commentator** role to create a new series, and
 The end product is a colourful text coverage of unfolding games of Rocket League!
 
 ![]() <img src="https://user-images.githubusercontent.com/49768006/209010722-4f6fa6b3-759e-448d-acb5-ed61cd644568.jpg"  width="500">
-
 
