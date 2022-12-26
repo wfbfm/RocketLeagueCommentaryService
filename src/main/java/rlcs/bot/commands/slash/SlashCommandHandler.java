@@ -1,5 +1,6 @@
 package rlcs.bot.commands.slash;
 
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -9,10 +10,13 @@ import rlcs.bot.commands.twitch.TwitchClipper;
 import rlcs.bot.commands.twitch.TwitchStatus;
 import rlcs.series.*;
 
+import java.util.List;
+
 public class SlashCommandHandler extends ListenerAdapter {
 
     private static TwitchClipper twitchClipper;
     private static final String COMMAND_CHANNEL = System.getenv("COMMAND_CHANNEL");
+    private static final String RLCS_BOT_USER_ID = System.getenv("BOT_USER_ID");
     public SlashCommandHandler(final TwitchClipper twitchClipper)
     {
         this.twitchClipper = twitchClipper;
@@ -21,7 +25,7 @@ public class SlashCommandHandler extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event)
     {
-        if (event.getName().equals(String.valueOf(SlashType.createseries)))
+        if (event.getName().equals(String.valueOf(SlashType.createseriesmanually)))
         {
             if (!event.getChannel().getId().equals(COMMAND_CHANNEL))
             {
@@ -29,13 +33,15 @@ public class SlashCommandHandler extends ListenerAdapter {
                         "by users with the Commentator role").setEphemeral(true).queue();
                 return;
             }
-            handleCreateSeriesEvent(event);
+            handleCreateSeriesManuallyEvent(event);
         }
     }
 
-    private static void handleCreateSeriesEvent(@NotNull SlashCommandInteractionEvent event)
+    private static void handleCreateSeriesManuallyEvent(@NotNull SlashCommandInteractionEvent event)
     {
         event.deferReply().queue();
+
+        int seriesId = getNewSeriesIdFromMessageHistory(event);
 
         String teamBlueOpt = event.getOption("teamblue").getAsString()
                 .replace(":", "")
@@ -44,12 +50,7 @@ public class SlashCommandHandler extends ListenerAdapter {
                 .replace(":", "")
                 .replace("-", "");
         int bestOfOpt = event.getOption("bestof").getAsInt();
-        int seriesIdOpt = event.getOption("seriesid").getAsInt();
-        int messageCountOpt = event.getOption("messagecount").getAsInt();
-        int blueSeriesScoreOpt = event.getOption("blueseriesscore").getAsInt();
-        int orangeSeriesScoreOpt = event.getOption("orangeseriesscore").getAsInt();
-        int blueGameScoreOpt = event.getOption("bluegamescore").getAsInt();
-        int orangeGameScoreOpt = event.getOption("orangegamescore").getAsInt();
+
         String bluePlayer1Opt = event.getOption("blueplayer1").getAsString().replace(";", "");
         String bluePlayer2Opt = event.getOption("blueplayer2").getAsString().replace(";", "");
         String bluePlayer3Opt = event.getOption("blueplayer3").getAsString().replace(";", "");
@@ -76,10 +77,10 @@ public class SlashCommandHandler extends ListenerAdapter {
                 new Player(orangePlayer3Opt),
                 TeamColour.ORANGE);
 
-        Series series = new Series(seriesIdOpt,
-                messageCountOpt,
-                new Score(blueGameScoreOpt, orangeGameScoreOpt),
-                new Score(blueSeriesScoreOpt, orangeSeriesScoreOpt),
+        Series series = new Series(seriesId,
+                0,
+                new Score(0, 0),
+                new Score(0, 0),
                 blueTeam,
                 orangeTeam,
                 bestOfOpt,
@@ -121,5 +122,30 @@ public class SlashCommandHandler extends ListenerAdapter {
                     )
                     .queue();
         }
+    }
+
+    private static int getNewSeriesIdFromMessageHistory(@NotNull SlashCommandInteractionEvent event)
+    {
+        List<Message> historicalMessages = event.getMessageChannel().getHistory().retrievePast(50).complete();
+        int oldSeriesId = 0;
+        for (Message message: historicalMessages)
+        {
+            if (!message.getAuthor().getId().equals(RLCS_BOT_USER_ID))
+            {
+                continue;
+            }
+            if (message.getContentRaw().length() == 0)
+            {
+                continue;
+            }
+            if (!(message.getContentRaw()).substring(0, 1).equals("S"))
+            {
+                continue;
+            }
+            String seriesIdString = message.getContentRaw().split("-")[0];
+            oldSeriesId = Integer.parseInt(seriesIdString.substring(1, seriesIdString.length()));
+            break;
+        }
+        return oldSeriesId + 1;
     }
 }
