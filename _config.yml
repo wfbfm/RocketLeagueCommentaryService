@@ -25,10 +25,10 @@ domain: wfbfm.github.io
 baseurl: /RocketLeagueCommentaryService # the subpath of your site, e.g. /blog
 url: https://wfbfm.github.io # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  wfbfm
-# logo: "rlcs-logo.png"
+logo: "rlcs-logo.png"
 
 # Build settings
-theme: minima
+remote_theme: just-the-docs/just-the-docs
 plugins:
   - jekyll-feed
 
