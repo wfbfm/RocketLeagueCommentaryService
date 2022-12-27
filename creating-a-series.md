@@ -5,6 +5,10 @@ nav_order: 3
 ---
 
 # Creating a Series
+
+The first step in your commentary journey: the setup.
+{: .fs-6 .fw-300 }
+
 {: .no_toc }
 
 <details open markdown="block">

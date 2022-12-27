@@ -28,15 +28,15 @@ player names, and so on.
 Once the series is created, [Enter Commentary]({{ site.baseurl }}{% link entering-commentary.md %})
 by pressing the appropriate action button:
 
-| Button               | Action Taken                                                 | Message Published to All Users    |
-|:---------------------|:-------------------------------------------------------------|:----------------------------------|
-| Goal (Team)          | +1 to the team's **game score**                              | Yes                               |
-| Game                 | +1 to the winning team's **series score**                    | Yes                               |
-| Overtime             | 'Overtime' flag set                                          | Yes                               |
-| Comment              | Publish comment, without impacting score                     | Yes                               |
-| Generate Twitch Clip | Creates a Twitch clip, which is appended to the next message | No (takes effect on next message) |
-| Remove Clip          | Removes the Twitch clip that was created                     | No                                |
-| Edit Score           | Edit the score without publishing updates                    | No                                |
+| Button               | Action Taken                                                 | Message Published to All Users |
+|:---------------------|:-------------------------------------------------------------|:-------------------------------|
+| Goal (Team)          | +1 to the team's **game score**                              | Yes                            |
+| Game                 | +1 to the winning team's **series score**                    | Yes                            |
+| Overtime             | 'Overtime' flag set                                          | Yes                            |
+| Comment              | Publish comment, without impacting score                     | Yes                            |
+| Generate Twitch Clip | Creates a Twitch clip, which is appended to the next message | _On next message_              |
+| Remove Clip          | Removes the Twitch clip that was created                     | No                             |
+| Edit Score           | Edit the score without publishing updates                    | No                             |
 
 {: .note }
 Only **Commentators** have access to this channel.
