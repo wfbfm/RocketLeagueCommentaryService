@@ -1,6 +1,6 @@
 # Rocket League Commentary Service
 
-[![RL Commentary Service Discord](https://discordapp.com/api/guilds/1055601137149030510/embed.png?style=banner2)](https://discord.gg/Y8sBAmrzrq)
+[![RL Commentary Service Discord](https://discordapp.com/api/guilds/1048640527920271381/embed.png?style=banner2)](https://discord.gg/Y8sBAmrzrq)
 
 This Discord bot powers the Rocket League Commentary Service!
 
