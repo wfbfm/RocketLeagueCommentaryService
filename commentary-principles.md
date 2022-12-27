@@ -18,24 +18,36 @@ nav_order: 6
 
 ---
 
-### Commentary should be professional
+### Write impactful, high-quality comments
 
-Elaborate more
+We want our readers to get the full viewing experience from your comments.
+Bring it to life!
 
 ---
 
-### No forms of abuse will be tolerated
+### Think beyond the pitch
 
-Elaborate more
+Refrain from only describing the immediate action on the pitch.
+Is the crowd loud?  Have analysts on the desk made some bold
+predictions?
+
+---
+
+### We're all biased - but find balance
+
+Nobody wants to read repeated spam of `NA>EU` or vice-versa.  Twitch
+chat already exists.
 
 ---
 
 ### Twitch Clips should be used sparingly
 
-Elaborate more
+We don't need to Clip every goal.  Think once-a-series, rather
+than once-a-goal!
 
 ---
 
-### Updates should be concise and colourful
+### No forms of abuse will be tolerated
 
-Elaborate more
+Remember that behind every screen is a human.
+Bad actors will be banned immediately.

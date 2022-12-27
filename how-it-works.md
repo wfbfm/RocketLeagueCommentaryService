@@ -22,8 +22,7 @@ First, we [Create a Series]({{ site.baseurl }}{% link creating-a-series.md %})
 in the channel.  The Bot responds with a template
 message containing all information about the series - including the current score,
 player names, and so on.
-
-![]() <img src="https://user-images.githubusercontent.com/49768006/209598981-7a1e4bf0-f3f4-4b70-8415-163107649d69.png"  width="500">
+![]() <img src="https://user-images.githubusercontent.com/49768006/209709778-df2d1e16-b957-4cd8-b3ac-324f78b233af.png">
 
 Once the series is created, [Enter Commentary]({{ site.baseurl }}{% link entering-commentary.md %})
 by pressing the appropriate action button:
